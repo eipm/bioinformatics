@@ -1,0 +1,52 @@
+stages:
+  - build
+  - test
+  - push
+  - deploy
+  - cleanup
+
+before_script:
+  - docker info
+  - docker version
+
+variables:
+  docker_container: "bioinformatics"
+  docker_image: "ipm-dc-dtr.weill.cornell.edu/ipm/bioinformatics"
+  docker_dtr: "ipm-dc-dtr.weill.cornell.edu"
+
+build:
+  stage: build
+  script:
+    - docker build -f Dockerfile -t ${docker_image} .
+    - if [ -z "${CI_BUILD_TAG}" ]; then echo "Tag not found. Exiting Build."; exit 0; fi
+    - docker build -f Dockerfile -t ${docker_image}:${CI_BUILD_TAG} .
+  when: on_success
+
+test:
+  stage: test
+  script:
+    - echo "Pending step..."
+  when: on_success
+    
+push:
+  stage: push
+  script:
+    - docker login -u ${dtr_svc_user} -p ${dtr_svc_pass} ${docker_dtr}
+    - docker push ${docker_image}:latest
+    - if [ -z "${CI_BUILD_TAG}" ]; then echo "Tag not found. Exiting Build."; docker logout; exit 0; fi
+    - docker push ${docker_image}:${CI_BUILD_TAG}
+    - docker logout
+  when: on_success
+
+deploy:
+  stage: deploy
+  script:
+    - echo "Pending step..."
+  when: on_success
+
+cleanup:
+  stage: cleanup
+  script:
+    - if [ -z "${CI_BUILD_TAG}" ]; then echo "No Tag found in commit. No cleanup is necessary. Exiting cleanup."; exit 0; fi
+    - docker rmi ${docker_image}:${CI_BUILD_TAG}
+  when: always
