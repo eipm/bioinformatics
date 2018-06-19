@@ -36,6 +36,7 @@ RUN yum groupinstall -y "Development Tools" && yum install -y \
 		flex-devel \
 		dejavu* \
 		systemctl \
+		zlib-devel \
 	&& yum -y clean all
 
 #===========================#
@@ -85,26 +86,26 @@ RUN wget http://sourceforge.net/projects/vcftools/files/vcftools_${VCFTOOLS_VERS
 #===========================#
 # Install BWA				#
 #===========================#
-ENV BWA_VERSION 0.7.12
-ENV bwa_dir /${PROGRAMS}/bwa-${BWA_VERSION}
-RUN wget http://sourceforge.net/projects/bio-bwa/files/bwa-${BWA_VERSION}.tar.bz2 \
-	&& tar jxf bwa-${BWA_VERSION}.tar.bz2 \
-	&& rm bwa-${BWA_VERSION}.tar.bz2 \
-	&& cd bwa-${BWA_VERSION} \
-	&& sed -e's#INCLUDES=#INCLUDES=-I../zlib-${ZLIB_VERSION}/ #' -e's#-lz#../zlib-${ZLIB_VERSION}/libz.a#' Makefile > Makefile.zlib \
-	&& make -f Makefile.zlib
+# ENV BWA_VERSION 0.7.12
+# ENV bwa_dir /${PROGRAMS}/bwa-${BWA_VERSION}
+# RUN wget http://sourceforge.net/projects/bio-bwa/files/bwa-${BWA_VERSION}.tar.bz2 \
+# 	&& tar jxf bwa-${BWA_VERSION}.tar.bz2 \
+# 	&& rm bwa-${BWA_VERSION}.tar.bz2 \
+# 	&& cd bwa-${BWA_VERSION} \
+# 	&& sed -e's#INCLUDES=#INCLUDES=-I../zlib-${ZLIB_VERSION}/ #' -e's#-lz#../zlib-${ZLIB_VERSION}/libz.a#' Makefile > Makefile.zlib \
+# 	&& make -f Makefile.zlib
 #===========================#
 # Install PINDEL			#
 #===========================#
 ## PINDEL version: version 0.2.5b6, 20150915 (downloaded Nov 10 2015)
 # https://github.com/genome/pindel/archive/v${PINDEL_VERSION}.tar.gz
-ENV PINDEL_VERSION 0.2.5b6
-ENV pindel_dir /${PROGRAMS}/pindel
-RUN wget -O pindel-master.zip https://github.com/genome/pindel/archive/master.zip \
-	&& unzip pindel-master.zip \
-	&& rm pindel-master.zip \
-	&& mv pindel-master pindel \
-	&& cd pindel \
-	&& ./INSTALL /${PROGRAMS}/samtools-${SAMTOOLS_VERSION}/htslib-${HTSLIB_VERSION}
+# ENV PINDEL_VERSION 0.2.5b6
+# ENV pindel_dir /${PROGRAMS}/pindel
+# RUN wget -O pindel-master.zip https://github.com/genome/pindel/archive/master.zip \
+# 	&& unzip pindel-master.zip \
+# 	&& rm pindel-master.zip \
+# 	&& mv pindel-master pindel \
+# 	&& cd pindel \
+# 	&& ./INSTALL /${PROGRAMS}/samtools-${SAMTOOLS_VERSION}/htslib-${HTSLIB_VERSION}
 
 
