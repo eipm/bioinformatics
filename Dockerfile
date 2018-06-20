@@ -37,6 +37,7 @@ RUN yum groupinstall -y "Development Tools" && yum install -y \
 		dejavu* \
 		systemctl \
 		zlib-devel \
+		vim \
 	&& yum -y clean all
 
 #===========================#
