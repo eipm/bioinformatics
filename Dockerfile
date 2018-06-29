@@ -1,5 +1,9 @@
-# Dockerfile for Myeloid Pipeline based on centOS:7.4.1708
-FROM ipm-dc-dtr.weill.cornell.edu/ipm/centos@sha256:cf98f0b57bf606eaee397b125c240f6bde5544480be3b7e46ad08934860434a9
+# # Dockerfile for Myeloid Pipeline based on centOS:7.4.1708
+# FROM ipm-dc-dtr.weill.cornell.edu/ipm/centos@sha256:cf98f0b57bf606eaee397b125c240f6bde5544480be3b7e46ad08934860434a9
+
+# FROM rocker/tidyverse:3.5.0
+FROM rocker/tidyverse@sha256:1dbac2029a1b03268d4c18fb73b2a70c3fd7d1baf73ad0f2e8dd965753225223 as rstudio
+
 #===============================#
 # Docker Image Configuration	#
 #===============================#
@@ -7,8 +11,10 @@ LABEL vendor="Englander Institute for Precision Medicine" \
 		description="Bioinformatics Tools" \
 		maintainer="ans2077@med.cornell.edu" \
 		base_image="ipm-dc-dtr.weill.cornell.edu/ipm/centos" \
-		base_image_version="7.4.1708.patched20180504" \
-		base_image_SHA256="sha256:cf98f0b57bf606eaee397b125c240f6bde5544480be3b7e46ad08934860434a9"
+		base_image_version="3.5.0" \
+    	base_image_SHA256="sha256:1dbac2029a1b03268d4c18fb73b2a70c3fd7d1baf73ad0f2e8dd965753225223"
+		# base_image_version="7.4.1708.patched20180504" \
+		# base_image_SHA256="sha256:cf98f0b57bf606eaee397b125c240f6bde5544480be3b7e46ad08934860434a9"
 
 ENV APP_NAME="bioinformatics" \
 	TZ='US/Eastern' \
@@ -16,97 +22,121 @@ ENV APP_NAME="bioinformatics" \
 #===========================#
 # CentOS Preparation    	#
 #===========================#
-RUN yum groupinstall -y "Development Tools" && yum install -y \
-		wget \
-		tar \
-		gcc \
-		gcc-c++ \
-		openssl-devel \
-		zip \
-		unzip \
-		make \
-		cmake \
-		which \
-		readline-devel \
-		libX11-devel \
-		libXt-devel \
-		cairo-devel \
-		pango-devel \
-		lzo-devel \
-		flex-devel \
-		dejavu* \
-		systemctl \
-		zlib-devel \
-		vim \
-	&& yum -y clean all
+ RUN apt-get install build-essential -y && apt-get install -y \
+	libncurses5-dev \
+	libbz2-1.0 \
+	libbz2-dev \
+	liblzma-dev \
+	zlib1g-dev \
+	libz-dev \
+ 	vim \
+	emacs 
+# 	zip \
+ 	# 	unzip \
+	# && apt-get -y clean all
+# 		wget \
+# 		tar \
+# 		gcc \
+# 		gcc-c++ \
+# 		openssl-devel \
+# 		make \
+# 		cmake \
+# 		which \
+# 		readline-devel \
+# 		libX11-devel \
+# 		libXt-devel \
+# 		cairo-devel \
+# 		pango-devel \
+# 		lzo-devel \
+# 		flex-devel \
+# 		dejavu* \
+# 		systemctl \
+# 		zlib-devel \
+
 
 #===========================#
 # Install BEDTOOLS			#
 #===========================#
-ENV BEDTOOLS_VERSION 2.26.0
-ENV bedtools_dir /${PROGRAMS}/bedtools2/bin/
+ENV BEDTOOLS_VERSION 2.27.1
+ENV bedtools_dir /${PROGRAMS}/bedtools-${BEDTOOLS_VERSION}
 RUN wget -O bedtools-${BEDTOOLS_VERSION}.tar.gz https://github.com/arq5x/bedtools2/releases/download/v${BEDTOOLS_VERSION}/bedtools-${BEDTOOLS_VERSION}.tar.gz \
- 	&& tar zxf bedtools-${BEDTOOLS_VERSION}.tar.gz \
+ 	&& tar zxf bedtools-${BEDTOOLS_VERSION}.tar.gz -C ${PROGRAMS} \
  	&& rm bedtools-${BEDTOOLS_VERSION}.tar.gz \
- 	&& cd bedtools2 \
- 	&& make
+ 	&& cd ${PROGRAMS}/bedtools2 \
+ 	&& make \
+	&& make install
 #===========================#
 # Install SAMTOOLS & HTSLIB #
 #===========================#
-ENV SAMTOOLS_VERSION 1.2
-ENV HTSLIB_VERSION 1.2.1
+ENV SAMTOOLS_VERSION 1.8
+ENV HTSLIB_VERSION 1.8
 ENV samtools_dir /${PROGRAMS}/samtools-${SAMTOOLS_VERSION}
 ENV htslib_dir ${samtools_dir}/htslib-${HTSLIB_VERSION}
 RUN wget -O samtools-${SAMTOOLS_VERSION}.tar.bz2 https://github.com/samtools/samtools/releases/download/${SAMTOOLS_VERSION}/samtools-${SAMTOOLS_VERSION}.tar.bz2 \
-	&& tar jxf samtools-${SAMTOOLS_VERSION}.tar.bz2 \
+	&& tar jxf samtools-${SAMTOOLS_VERSION}.tar.bz2 -C ${PROGRAMS} \
 	&& rm samtools-${SAMTOOLS_VERSION}.tar.bz2 \
-	&& cd samtools-${SAMTOOLS_VERSION} \
+	&& cd ${samtools_dir} \
 	&& make \
+	&& make install \
 	&& cd htslib-${HTSLIB_VERSION} \
-	&& make
-#===========================#
-# Install BCFTOOLS			#
-#===========================#
-ENV BCFTOOLS_VERSION 1.2
+	&& make \
+	&& make install
+# #===========================#
+# # Install BCFTOOLS			#
+# #===========================#
+ENV BCFTOOLS_VERSION 1.8
 ENV bcftools_dir /${PROGRAMS}/bcftools-${BCFTOOLS_VERSION}
 RUN wget -O bcftools-${BCFTOOLS_VERSION}.tar.bz2 https://github.com/samtools/bcftools/releases/download/${BCFTOOLS_VERSION}/bcftools-${BCFTOOLS_VERSION}.tar.bz2 \
-	&& tar jxf bcftools-${BCFTOOLS_VERSION}.tar.bz2 \
+	&& tar jxf bcftools-${BCFTOOLS_VERSION}.tar.bz2 -C ${PROGRAMS} \
 	&& rm bcftools-${BCFTOOLS_VERSION}.tar.bz2 \
-	&& cd bcftools-${BCFTOOLS_VERSION} \
-	&& make
+	&& cd ${bcftools_dir} \
+	&& make \
+	&& make install
 #===========================#
 # Install VCFTOOLS			#
 #===========================#
-ENV VCFTOOLS_VERSION="0.1.13"
-ENV vcftools_dir /${PROGRAMS}/vcftools_${VCFTOOLS_VERSION}/bin/
-RUN wget http://sourceforge.net/projects/vcftools/files/vcftools_${VCFTOOLS_VERSION}.tar.gz \
-	&& tar zxf vcftools_${VCFTOOLS_VERSION}.tar.gz \
-	&& rm vcftools_${VCFTOOLS_VERSION}.tar.gz \
-	&& cd vcftools_${VCFTOOLS_VERSION} \
-	&& make
+ENV VCFTOOLS_VERSION 0.1.15
+ENV vcftools_dir ${PROGRAMS}/vcftools-${VCFTOOLS_VERSION}
+RUN wget -O vcftools-${VCFTOOLS_VERSION}.tar.gz https://github.com/vcftools/vcftools/releases/download/v${VCFTOOLS_VERSION}/vcftools-${VCFTOOLS_VERSION}.tar.gz \
+	&& tar zxf vcftools-${VCFTOOLS_VERSION}.tar.gz -C ${PROGRAMS} \
+	&& rm vcftools-${VCFTOOLS_VERSION}.tar.gz \
+	&& cd ${vcftools_dir} \
+	&& ./configure --bindir=/usr/local/bin \
+	&& make \
+	&& make install
 #===========================#
 # Install BWA				#
 #===========================#
-# ENV BWA_VERSION 0.7.12
-# ENV bwa_dir /${PROGRAMS}/bwa-${BWA_VERSION}
-# RUN wget http://sourceforge.net/projects/bio-bwa/files/bwa-${BWA_VERSION}.tar.bz2 \
-# 	&& tar jxf bwa-${BWA_VERSION}.tar.bz2 \
-# 	&& rm bwa-${BWA_VERSION}.tar.bz2 \
-# 	&& cd bwa-${BWA_VERSION} \
-# 	&& sed -e's#INCLUDES=#INCLUDES=-I../zlib-${ZLIB_VERSION}/ #' -e's#-lz#../zlib-${ZLIB_VERSION}/libz.a#' Makefile > Makefile.zlib \
-# 	&& make -f Makefile.zlib
+ENV BWA_VERSION 0.7.17
+ENV bwa_dir /${PROGRAMS}/bwa-${BWA_VERSION}
+RUN wget -O bwa-${BWA_VERSION}.tar.bz2 http://sourceforge.net/projects/bio-bwa/files/bwa-${BWA_VERSION}.tar.bz2 \
+	&& tar jxf bwa-${BWA_VERSION}.tar.bz2 -C /${PROGRAMS} \
+	&& rm bwa-${BWA_VERSION}.tar.bz2 \
+	&& cd ${bwa_dir} \
+	&& make -f Makefile
+
 #===========================#
 # Install PINDEL			#
 #===========================#
+ENV pindel_dir /${PROGRAMS}/pindel
+RUN cd ${PROGRAMS} \
+	&& git clone https://github.com/genome/pindel \
+	&& cd pindel \
+	&& git fetch origin pull/64/head:fix \
+	&& git checkout fix \
+	&& ./INSTALL ${htslib_dir}
+
 ## PINDEL version: version 0.2.5b6, 20150915 (downloaded Nov 10 2015)
 # https://github.com/genome/pindel/archive/v${PINDEL_VERSION}.tar.gz
 # ENV PINDEL_VERSION 0.2.5b6
 # ENV pindel_dir /${PROGRAMS}/pindel
 # RUN wget -O pindel-master.zip https://github.com/genome/pindel/archive/master.zip \
-# 	&& unzip pindel-master.zip \
+# 	&& unzip pindel-master.zip \	
 # 	&& rm pindel-master.zip \
 # 	&& mv pindel-master pindel \
 # 	&& cd pindel \
-# 	&& ./INSTALL /${PROGRAMS}/samtools-${SAMTOOLS_VERSION}/htslib-${HTSLIB_VERSION}
-
-
+	# && ./INSTALL ${htslib_dir}/htslib-${HTSLIB_VERSION}
+	# && ./INSTALL /${PROGRAMS}/samtools-${SAMTOOLS_VERSION}/htslib-${HTSLIB_VERSION}
+RUN ln -s    ${bwa_dir}/bwa /usr/local/bin/bwa \
+	&& ln -s ${pindel_dir}/pindel /usr/local/bin/pindel 
+RUN apt-get upgrade -y
