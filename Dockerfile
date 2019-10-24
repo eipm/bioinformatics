@@ -1,8 +1,6 @@
-# # Dockerfile for Myeloid Pipeline based on centOS:7.4.1708
-# FROM ipm-dc-dtr.weill.cornell.edu/ipm/centos@sha256:cf98f0b57bf606eaee397b125c240f6bde5544480be3b7e46ad08934860434a9
-
-# FROM rocker/tidyverse:3.5.0
-FROM rocker/tidyverse@sha256:1dbac2029a1b03268d4c18fb73b2a70c3fd7d1baf73ad0f2e8dd965753225223 as rstudio
+# FROM rocker/tidyverse:3.6.1
+#FROM rocker/tidyverse@sha256:1dbac2029a1b03268d4c18fb73b2a70c3fd7d1baf73ad0f2e8dd965753225223 as rstudio
+FROM rocker/tidyverse@sha256:1dcabfa76b086b1ddfc1660ceb308f6ff6856e50e7692e82a35c8ed7992680a5 as rstudio
 
 #===============================#
 # Docker Image Configuration	#
@@ -10,11 +8,9 @@ FROM rocker/tidyverse@sha256:1dbac2029a1b03268d4c18fb73b2a70c3fd7d1baf73ad0f2e8d
 LABEL vendor="Englander Institute for Precision Medicine" \
 		description="Bioinformatics Tools" \
 		maintainer="ans2077@med.cornell.edu" \
-		base_image="ipm-dc-dtr.weill.cornell.edu/ipm/centos" \
-		base_image_version="3.5.0" \
+		base_image="rocker/tidyverse:3.6.1" \
+		base_image_version="3.6.1" \
     	base_image_SHA256="sha256:1dbac2029a1b03268d4c18fb73b2a70c3fd7d1baf73ad0f2e8dd965753225223"
-		# base_image_version="7.4.1708.patched20180504" \
-		# base_image_SHA256="sha256:cf98f0b57bf606eaee397b125c240f6bde5544480be3b7e46ad08934860434a9"
 
 ENV APP_NAME="bioinformatics" \
 	TZ='US/Eastern' \
@@ -140,3 +136,8 @@ RUN cd ${PROGRAMS} \
 RUN ln -s    ${bwa_dir}/bwa /usr/local/bin/bwa \
 	&& ln -s ${pindel_dir}/pindel /usr/local/bin/pindel 
 RUN apt-get upgrade -y
+
+## Adding common R libraries
+RUN mkdir -p /R/scripts
+ADD installPackages.R /R/scripts
+RUN Rscript /R/scripts/installPackages.R 
