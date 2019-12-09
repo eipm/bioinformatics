@@ -18,6 +18,7 @@ ENV APP_NAME="bioinformatics" \
 #===========================#
 # CentOS Preparation    	#
 #===========================#
+RUN apt-get update 
  RUN apt-get install build-essential -y && apt-get install -y \
 	libncurses5-dev \
 	libbz2-1.0 \
