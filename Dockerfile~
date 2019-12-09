@@ -141,6 +141,3 @@ RUN apt-get upgrade -y
 RUN mkdir -p /R/scripts
 ADD installPackages.R /R/scripts
 RUN Rscript /R/scripts/installPackages.R 
-
-### Add utilities file
-COPY *sh ${PROGRAMS}
