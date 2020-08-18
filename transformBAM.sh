@@ -25,7 +25,7 @@ logMsg() {
         fi
 }
 
-if [[ $# -ne 4 ]];then
+if [[ $# -ne 5 ]];then
     usage
     cleanUp 127
 fi
