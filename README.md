@@ -20,10 +20,10 @@ Common R packages are also installed. See `installPackages.R` to see which ones.
 
 ## Installation
 
-To install the component:
+To install the component (assumining version 1.0.0):
 
 ```bash
-docker pull ipm-dc-dtr.weill.cornell.edu/ipm/bioinformatics:1.0.0
+docker pull <DTR-URL>/bioinformatics:1.0.0
 ```
 
 The user must have successfully logged in the docker DTR with `docker login`  
@@ -33,13 +33,13 @@ The user must have successfully logged in the docker DTR with `docker login`
 The basic way to use this component is:
 
 ```bash
-docker run --rm -it --name bioinfo ipm-dc-dtr.weill.cornell.edu/ipm/bioinformatics:1.0.0  /bin/bash
+docker run --rm -it --name bioinfo <DTR-URL>/bioinformatics:1.0.0  /bin/bash
 ```
 
 If specific file mounts are needed, use the `-v` option (see [docker run reference documentation](https://docs.docker.com/engine/reference/run/)). For example:
 
 ```bash
-docker run --rm -it --name bioinfo -v /path/to/local/folder/:/path/to/internal/folder ipm-dc-dtr.weill.cornell.edu/ipm/bioinformatics:1.0.0  /bin/bash
+docker run --rm -it --name bioinfo -v /path/to/local/folder/:/path/to/internal/folder <DTR-URL>/bioinformatics:1.0.0  /bin/bash
 ```
 
 **Tip**: use the `:ro` option to mount read-only folders, e.g. `-v /path/to/local/folder/:/path/to/internal/folder:ro`
