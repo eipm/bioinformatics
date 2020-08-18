@@ -124,3 +124,16 @@ RUN Rscript /R/scripts/installPackages.R
 ### Add utilities file
 COPY combine_pindel_vcfs.sh ${PROGRAMS}
 COPY transformBAM.sh /usr/local/bin/
+
+
+#===========================#
+# Security Updates			#
+#===========================#
+ENV GHOSTSCRIPT_VER 9.52
+ENV GS_VER 952
+ENV GHOSTSCRIPT_DIR /${PROGRAMS}/ghostscript-${GHOSTSCRIPT_VER}-linux-x86_64
+RUN apt-get install -y gzip tar
+RUN wget -O ghostscript-${GHOSTSCRIPT_VER}-linux-x86_64.tgz https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs${GS_VER}/ghostscript-${GHOSTSCRIPT_VER}-linux-x86_64.tgz \
+	&& tar -vxzf ghostscript-${GHOSTSCRIPT_VER}-linux-x86_64.tgz -C ${PROGRAMS} \
+	&& rm ghostscript-${GHOSTSCRIPT_VER}-linux-x86_64.tgz \
+	&& ln -sf ${GHOSTSCRIPT_DIR}/gs-${GS_VER}-linux-x86_64 /usr/bin/gs
