@@ -52,6 +52,13 @@ done
 
 logMsg "INFO" "--------------------- START Transformation -----------------------"
 logMsg "INFO" "Creating new header"
+if [[ ! -e "$FILE_IN" ]];then
+    logMsg "ERROR" "Input file does not exists: ($FILE_IN)"
+fi
+if [[ ! -e "$(dirname $FILE_IN)" ]];then
+    logMsg "WARN" "Output folder does not exists: ($FILE_IN).\nCreating it now."
+    mkdir -P $(dirname "$FILE_IN")
+fi
 samtools view -H $FILE_IN -@ 8 | sed "s%$PM_IN%$PM_OUT%g" > BAM.new.header.sam.txt
 logMsg "INFO" "Checking new header for PM IDs"
 if [[ $(grep -c $PM_IN BAM.new.header.sam.txt) -gt 0 ]];then
@@ -66,7 +73,7 @@ else
         samtools view $FILE_IN | grep $PM_IN | head -n 2
         cleanUp -3
 fi
-echo "Checking the final output for PM IDs"
+logMsg "INFO" "Checking the final output for PM IDs"
 if [[ $(samtools view -H  -@8 $FILE_OUT | grep -c $PM_IN) -gt 0 ]];then
         logMsg "ERROR" "Found PM IDs in the header"
 fi

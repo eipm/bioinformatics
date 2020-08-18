@@ -126,18 +126,12 @@ COPY combine_pindel_vcfs.sh ${PROGRAMS}
 COPY transformBAM.sh /usr/local/bin/
 RUN chmod ugo+x /usr/local/bin/transformBAM.sh
 
-
 #===========================#
 # Security Updates			#
 #===========================#
 ENV GHOSTSCRIPT_VER 9.52
 ENV GS_VER 952
 ENV GHOSTSCRIPT_DIR /${PROGRAMS}/ghostscript-${GHOSTSCRIPT_VER}
-# RUN wget -O ghostscript-${GHOSTSCRIPT_VER}-linux-x86_64.tgz https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs${GS_VER}/ghostscript-${GHOSTSCRIPT_VER}-linux-x86_64.tgz \
-# 	&& tar -vxzf ghostscript-${GHOSTSCRIPT_VER}-linux-x86_64.tgz -C ${PROGRAMS} \
-# 	&& rm ghostscript-${GHOSTSCRIPT_VER}-linux-x86_64.tgz \
-# 	&& ln -sf ${GHOSTSCRIPT_DIR}/gs-${GS_VER}-linux-x86_64 /usr/bin/gs
-
 RUN wget -O ghostscript-${GHOSTSCRIPT_VER}.tar.gz https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs952/ghostscript-9.52.tar.gz \
 	&& tar -vxzf ghostscript-${GHOSTSCRIPT_VER}.tar.gz -C ${PROGRAMS} \
 	&& rm ghostscript-${GHOSTSCRIPT_VER}.tar.gz \
