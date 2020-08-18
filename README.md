@@ -33,7 +33,7 @@ The user must have successfully logged in the docker DTR with `docker login`
 The basic way to use this component is:
 
 ```bash
-docker run --rm -it --name bioinfo <DTR-URL>/bioinformatics:1.0.0  /bin/bash
+docker run --rm -it --name bioinfo eipm/bioinformatics:1.0.0  /bin/bash
 ```
 
 If specific file mounts are needed, use the `-v` option (see [docker run reference documentation](https://docs.docker.com/engine/reference/run/)). For example:
@@ -43,3 +43,6 @@ docker run --rm -it --name bioinfo -v /path/to/local/folder/:/path/to/internal/f
 ```
 
 **Tip**: use the `:ro` option to mount read-only folders, e.g. `-v /path/to/local/folder/:/path/to/internal/folder:ro`
+
+### Transform BAM
+This image also include an utility called `transformBAM.sh` that will transform a BAM file by replacing IDs in the header. It will warn if changes need to occur in the content of the BAM file, e.g. the RG group. To use it, simply type `transformBAM.sh` and the usage will be displayed.
