@@ -122,4 +122,5 @@ ADD installPackages.R /R/scripts
 RUN Rscript /R/scripts/installPackages.R 
 
 ### Add utilities file
-COPY *sh ${PROGRAMS}
+COPY combine_pindel_vcfs.sh ${PROGRAMS}
+COPY transformBAM.sh /usr/local/bin/
