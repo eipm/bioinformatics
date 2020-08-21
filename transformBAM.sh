@@ -130,5 +130,10 @@ fi
 logMsg "INFO" "No old IDs found in the header or the BAM file"
 logMsg "INFO" "Indexing the file"
 samtools index -@ 8 $FILE_OUT || logMsg "ERROR" "Indexing failed $FILE_OUT"
+logMsg "DEBUG" "Checking that all reads are included from the original BAM file"
+newSize=$(samtools view -c -@8 $FILE_OUT)
+if [[ ! $originalSize -eq $newSize ]];then
+        logMsg "ERROR" "The new final version is different from the original BAM file."
+fi  
 logMsg "INFO" "-------- END Transformation ----"
 cleanUp 0
