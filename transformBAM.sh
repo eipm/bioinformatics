@@ -6,7 +6,7 @@ fi
 PROGRAM=$0
 
 usage() {
-    echo -e "Usage:\tbash $PROGRAM [-i|--file-in] [-o|--file-out] [-p|--pm-in] [-r|--pm-out]"
+    echo -e "Usage:\tbash $PROGRAM [-i|--file-in] [-o|--dir-out] [-p|--pm-in] [-r|--pm-out]"
 }
 cleanUp() {
         if [[ -e BAM.new.header.sam.txt ]];then
@@ -35,8 +35,8 @@ while [ "$1" != "" ]; do
         -i | --file-in )    shift
                             FILE_IN=$1
                             ;;
-        -o | --file-out )   shift
-                            FILE_OUT=$1
+        -o | --dir-out )    shift
+                            DIR_OUT=$1
                             ;;
         -p | --pm-in )      shift
                             PM_IN=$1
@@ -54,68 +54,81 @@ logMsg "INFO" "--------------------- START Transformation ----------------------
 if [[ ! -e "$FILE_IN" ]];then
     logMsg "ERROR" "Input file does not exists: ($FILE_IN)"
 fi
-if [[ ! -e "$(dirname $FILE_OUT)" ]];then
-    logMsg "WARN" "Output folder does not exists: ($FILE_OUT).\nCreating it now."
-    mkdir -p $(dirname "$FILE_OUT")
+DIR_IN="$(pwd)"
+originalSize=$(samtools view -c -@4 "$DIR_IN/$FILE_IN")
+if [[ ! -e "$DIR_OUT" ]];then
+    logMsg "WARN" "Output folder does not exists: ($DIR_OUT).\nCreating it now."
+    mkdir -p $DIR_OUT
 fi
+logMsg "DEBUG" "Directory Out: ($DIR_OUT)"
+FILE_OUT=$(echo $FILE_IN | sed "s%$PM_IN%$PM_OUT%g")
+logMsg "DEBUG" "File Name Out: ($FILE_OUT)"
+
+cd "$DIR_OUT"
 logMsg "INFO" "Making sure it's in samtools v10 format"
-samtools view -H "$FILE_IN" -@ 8 | sed "s%FCID:%FC:%g" | sed "s%BCID:%BC:%g" | sed "s%LNID:%LN:%g" > BAM.v10.header.txt
-samtools reheader -P BAM.v10.header.txt "$FILE_IN" > "$FILE_OUT".v10.bam 
+samtools view -H "$DIR_IN/$FILE_IN" -@ 8 | sed "s%FCID:%FC:%g" | sed "s%BCID:%BC:%g" | sed "s%LNID:%LN:%g" > BAM.v10.header.txt || logMsg "ERROR" "Something wrong with generating the v10 header."
+samtools reheader -P BAM.v10.header.txt "$DIR_IN/$FILE_IN" > sample.v10.bam || logMsg "ERROR" "Something wrong with v10 header transformation."
 rm BAM.v10.header.txt
-
-logMsg "INFO" "Creating new header with the new IDs"
-samtools view -H "$FILE_IN" -@ 8 | sed "s%$PM_IN%$PM_OUT%g"  > BAM.new.header.txt
-
-logMsg "INFO" "Checking new header for PM IDs"
-if [[ $(grep -c "$PM_IN" BAM.new.header.txt) -gt 0 ]];then
-        logMsg "ERROR" "Found PM ID in header"
-fi
-
-logMsg "DEBUG" "File Out:\t($FILE_OUT)"
-
+logMsg "INFO" "Checking that the v10 version is equivalent to the original BAM"
+newSize=$(samtools view -c -@4 sample.v10.bam)
+if [[ ! $originalSize -eq $newSize ]];then
+        logMsg "ERROR" "The v10 version is different from the original BAM file."
+fi      
 logMsg "INFO" "Splitting the BAM by @RGs"
-samtools split -@ 8 -u "$FILE_OUT".bam:"$FILE_OUT".v10.bam -f "$FILE_OUT_%#.%." "$FILE_IN".v10.bam
-
-for fileIn in "$(echo $FILE_IN.v10.bam | sed 's/.bam$//')"_*.bam
+samtools split -@ 8 -u sample.v10.noRG.bam:sample.v10.bam -f "sample.v10_%#.%."  sample.v10.bam || logMsg "ERROR" "Splitting didn't work"
+rm sample.v10.bam
+if [[ $(samtools view -c sample.v10.noRG.bam ) == 0 ]];then
+        logMsg "INFO" "All reads have a valid RG"
+        rm sample.v10.noRG.bam
+else
+        logMsg "WARN" "Some reads don't have an RG"
+fi
+for currentBAM in sample.v10_*.bam
 do
-        logMsg "INFO" "Getting the RG_ID"
-        RG_ID=$(samtools view -H $fileIn | grep "RG" | awk '{print $2}' | sed -r 's%^ID:(.*)$%\1%')
-        logMsg "DEBUG" "RG_ID:\t($RG_ID)"
+        logMsg "DEBUG" "Processing ($currentBAM)"
+        logMsg "INFO" "Creating new header with the new IDs"
+        samtools view -H "$currentBAM" -@ 8 | sed "s%$PM_IN%$PM_OUT%g"  > currentBAM.new.header.txt || logMsg "ERROR" "Something wrong with generating the sanitized header."
+
+        logMsg "INFO" "Checking new header for old IDs"
+        if [[ $(grep -c "$PM_IN" currentBAM.new.header.txt) -gt 0 ]];then
+                logMsg "ERROR" "Found IDs in the new header for $currentBAM"
+        fi        
+
+        logMsg "INFO" "Getting the new RG_ID from the new header"
+        RG_ID=$(grep "^@RG" currentBAM.new.header.txt | awk '{print $2}' | sed -r 's%^ID:(.*)$%\1%')
+        
+        logMsg "DEBUG" "New RG_ID: ($RG_ID)"
 
         logMsg "INFO" "Assigning the new header"
-        samtools reheader -P BAM.new.header.txt --in-place "$fileIn" > /dev/null
+        samtools reheader -P currentBAM.new.header.txt "$currentBAM" > tmp.bam || logMsg "ERROR" "Reheader had some issues"
+        rm "$currentBAM" # to save space
         logMsg "INFO" "Replacing RGs"
-        samtools addreplacerg -R $RG_ID -o "$fileIn".replace.bam $fileIn
+        samtools addreplacerg -@ 8 -R $RG_ID -o "$currentBAM".rg.bam tmp.bam || logMsg "ERROR" "Something wrong with replacing RG for $RG_ID"
+        rm tmp.bam currentBAM.new.header.txt
+        logMsg "INFO" "Checking BAM file for old IDs"
+        if [[ $(samtools view "$currentBAM".rg.bam | grep -c $PM_IN) -gt 0 ]];then
+                logMsg "ERROR" "Found old IDs in BAM file. Need to change it. See an example: $(samtools view "$currentBAM" | grep $PM_IN | head -n 2)"
+        else
+                logMsg "INFO" "No old IDs found in BAM file."
+        fi
 done
-exit 
-logMsg "INFO" "Checking the @RG info"
-mapfile -t RG_ARRAY < <(samtools view -H "$FILE_IN" | grep @RG)
+logMsg "INFO" "Creating the list of BAM files to merge"
+logMsg "DEBUG" "Current directory: $(pwd)"
+ls -1 sample.v10_*.bam.rg.bam > bam_files_to_merge || logMsg "ERROR" "Cannot create a list of BAM files"
+samtools merge -b bam_files_to_merge -c -p -@ 8 $FILE_OUT || logMsg "ERROR" "Merging didn't work"
+logMsg "DEBUG" "Removing temporary files"
+cat bam_files_to_merge | xargs rm || logMsg "ERROR" "Cannot remove temporary BAM files sample.v10*"
+rm bam_files_to_merge|| logMsg "ERROR" "Cannot remove bam_files_to_merge"
 
-logMsg "INFO" "Splitting the BAM into the different @RGs"
-for RG in $RG_ARRAY
-do
-        samtools view -R $RG -bo $FILE_OUT"_"$RG".bam" "$FILE_IN"
-        RG_REPLACE=$(echo $RG | sed "s%$PM_IN%$PM_OUT")
-        samtools addreplacerg -r $RG_REPLACE -o $FILE_OUT"_"$RG_REPLACE".bam" $FILE_OUT"_"$RG".bam"
-done
-
-logMsg "INFO" "Checking BAM file for PM IDs"
-if [[ $(samtools view "$FILE_IN" | grep -c $PM_IN) -gt 0 ]];then
-        logMsg "WARN" "Found PM IDs in BAM file. Need to change it. See an example:"
-        samtools view "$FILE_IN" | grep $PM_IN | head -n 2
-        logMsg "INFO"
-else
-        logMsg "INFO" "No PM IDs found in BAM file. Simply re-head the BAM file"
-fi
 logMsg "INFO" "Checking the final output for PM IDs"
 if [[ $(samtools view -H  -@8 $FILE_OUT | grep -c $PM_IN) -gt 0 ]];then
-        logMsg "ERROR" "Found PM IDs in the header"
+        logMsg "ERROR" "Found old IDs in the header"
 fi
 if [[ $(samtools view     -@8 $FILE_OUT | grep -c $PM_IN) -gt 0 ]];then
-        logMsg "ERROR" "Found PM IDs in the BAM file"
+        logMsg "ERROR" "Found old IDs in the BAM file"
 fi
-logMsg "INFO" "No PM IDs found in the header or the BAM file"
+logMsg "INFO" "No old IDs found in the header or the BAM file"
 logMsg "INFO" "Indexing the file"
-samtools index -@ 8 $FILE_OUT
+samtools index -@ 8 $FILE_OUT || logMsg "ERROR" "Indexing failed $FILE_OUT"
 logMsg "INFO" "-------- END Transformation ----"
 cleanUp 0
