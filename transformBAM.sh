@@ -58,15 +58,36 @@ if [[ ! -e "$(dirname $FILE_IN)" ]];then
     logMsg "WARN" "Output folder does not exists: ($FILE_IN).\nCreating it now."
     mkdir -P $(dirname "$FILE_IN")
 fi
-logMsg "INFO" "Creating new header"
-samtools view -H "$FILE_IN" -@ 8 | sed "s%$PM_IN%$PM_OUT%g" > BAM.new.header.sam.txt
+logMsg "INFO" "Making sure it's in samtools v10 format"
+samtools view -H "$FILE_IN" -@ 8 | sed "s%FCID:%FC:%g" | sed "s%BCID:%BC:%g" | sed "s%LNID:%LN:%g" > BAM.v10.header.txt
+samtools reheader -P BAM.new.header.sam.txt --in-place "$FILE_IN"
+rm BAM.v10.header.txt
+
+logMsg "INFO" "Creating new header with the new IDs"
+samtools view -H "$FILE_IN" -@ 8 | sed "s%$PM_IN%$PM_OUT%g"  > BAM.new.header.txt
+
 logMsg "INFO" "Checking new header for PM IDs"
 if [[ $(grep -c $PM_IN BAM.new.header.sam.txt) -gt 0 ]];then
         logMsg "ERROR" "Found PM ID in header"
 fi
-logMsg "INFO" "Assigning the new header"
-samtools reheader -P BAM.new.header.sam.txt $FILE_IN > $FILE_OUT
 
+logMsg "DEBUG" "File Out:\t($FILE_OUT)"
+
+logMsg "INFO" "Splitting the BAM by @RGs"
+samtools split "$FILE_OUT"
+exit
+for fileIn in "$(echo $FILE_OUT | sed 's/.bam//')"_*.bam
+do
+        logMsg "INFO" "Getting the RG_ID"
+        RG_ID=$(samtools view -H $fileIn | grep "RG" | awk '{print $2}' | sed -r 's%^ID:(.*)$%\1\t%')
+        logMsg "DEBUG" "RG_ID:\t($RG_ID)"
+
+        logMsg "INFO" "Assigning the new header"
+        samtools reheader -P BAM.new.header.txt --in-place "$fileIn"
+        logMsg "INFO" "Replacing RGs"
+        samtools addreplacerg -R $RG_ID -o "$fileIn".replace.bam $fileIn
+done
+exit 
 logMsg "INFO" "Checking the @RG info"
 mapfile -t RG_ARRAY < <(samtools view -H "$FILE_IN" | grep @RG)
 
