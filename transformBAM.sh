@@ -60,7 +60,7 @@ if [[ ! -e "$(dirname $FILE_IN)" ]];then
 fi
 logMsg "INFO" "Making sure it's in samtools v10 format"
 samtools view -H "$FILE_IN" -@ 8 | sed "s%FCID:%FC:%g" | sed "s%BCID:%BC:%g" | sed "s%LNID:%LN:%g" > BAM.v10.header.txt
-samtools reheader -P BAM.new.header.sam.txt --in-place "$FILE_IN"
+samtools reheader -P BAM.v10.header.txt "$FILE_IN" > "$FILE_IN".v10.bam 
 rm BAM.v10.header.txt
 
 logMsg "INFO" "Creating new header with the new IDs"
@@ -74,9 +74,9 @@ fi
 logMsg "DEBUG" "File Out:\t($FILE_OUT)"
 
 logMsg "INFO" "Splitting the BAM by @RGs"
-samtools split "$FILE_OUT"
-exit
-for fileIn in "$(echo $FILE_OUT | sed 's/.bam//')"_*.bam
+samtools split "$FILE_IN".v10.bam
+
+for fileIn in "$(echo $FILE_IN.v10.bam | sed 's/.bam$//')"_*.bam
 do
         logMsg "INFO" "Getting the RG_ID"
         RG_ID=$(samtools view -H $fileIn | grep "RG" | awk '{print $2}' | sed -r 's%^ID:(.*)$%\1\t%')
