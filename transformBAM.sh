@@ -54,36 +54,36 @@ logMsg "INFO" "--------------------- START Transformation ----------------------
 if [[ ! -e "$FILE_IN" ]];then
     logMsg "ERROR" "Input file does not exists: ($FILE_IN)"
 fi
-if [[ ! -e "$(dirname $FILE_IN)" ]];then
-    logMsg "WARN" "Output folder does not exists: ($FILE_IN).\nCreating it now."
-    mkdir -P $(dirname "$FILE_IN")
+if [[ ! -e "$(dirname $FILE_OUT)" ]];then
+    logMsg "WARN" "Output folder does not exists: ($FILE_OUT).\nCreating it now."
+    mkdir -p $(dirname "$FILE_OUT")
 fi
 logMsg "INFO" "Making sure it's in samtools v10 format"
 samtools view -H "$FILE_IN" -@ 8 | sed "s%FCID:%FC:%g" | sed "s%BCID:%BC:%g" | sed "s%LNID:%LN:%g" > BAM.v10.header.txt
-samtools reheader -P BAM.v10.header.txt "$FILE_IN" > "$FILE_IN".v10.bam 
+samtools reheader -P BAM.v10.header.txt "$FILE_IN" > "$FILE_OUT".v10.bam 
 rm BAM.v10.header.txt
 
 logMsg "INFO" "Creating new header with the new IDs"
 samtools view -H "$FILE_IN" -@ 8 | sed "s%$PM_IN%$PM_OUT%g"  > BAM.new.header.txt
 
 logMsg "INFO" "Checking new header for PM IDs"
-if [[ $(grep -c $PM_IN BAM.new.header.sam.txt) -gt 0 ]];then
+if [[ $(grep -c "$PM_IN" BAM.new.header.txt) -gt 0 ]];then
         logMsg "ERROR" "Found PM ID in header"
 fi
 
 logMsg "DEBUG" "File Out:\t($FILE_OUT)"
 
 logMsg "INFO" "Splitting the BAM by @RGs"
-samtools split "$FILE_IN".v10.bam
+samtools split -@ 8 -u "$FILE_OUT".bam:"$FILE_OUT".v10.bam -f "$FILE_OUT_%#.%." "$FILE_IN".v10.bam
 
 for fileIn in "$(echo $FILE_IN.v10.bam | sed 's/.bam$//')"_*.bam
 do
         logMsg "INFO" "Getting the RG_ID"
-        RG_ID=$(samtools view -H $fileIn | grep "RG" | awk '{print $2}' | sed -r 's%^ID:(.*)$%\1\t%')
+        RG_ID=$(samtools view -H $fileIn | grep "RG" | awk '{print $2}' | sed -r 's%^ID:(.*)$%\1%')
         logMsg "DEBUG" "RG_ID:\t($RG_ID)"
 
         logMsg "INFO" "Assigning the new header"
-        samtools reheader -P BAM.new.header.txt --in-place "$fileIn"
+        samtools reheader -P BAM.new.header.txt --in-place "$fileIn" > /dev/null
         logMsg "INFO" "Replacing RGs"
         samtools addreplacerg -R $RG_ID -o "$fileIn".replace.bam $fileIn
 done
