@@ -55,7 +55,7 @@ if [[ ! -e "$FILE_IN" ]];then
     logMsg "ERROR" "Input file does not exists: ($FILE_IN)"
 fi
 DIR_IN="$(pwd)"
-originalSize=$(samtools view -c -@4 "$DIR_IN/$FILE_IN")
+originalSize=$(samtools view -c -@ 4 "$DIR_IN/$FILE_IN")
 if [[ ! -e "$DIR_OUT" ]];then
     logMsg "WARN" "Output folder does not exists: ($DIR_OUT).\nCreating it now."
     mkdir -p $DIR_OUT
@@ -70,14 +70,14 @@ samtools view -H "$DIR_IN/$FILE_IN" -@ 8 | sed "s%FCID:%FC:%g" | sed "s%BCID:%BC
 samtools reheader -P BAM.v10.header.txt "$DIR_IN/$FILE_IN" > sample.v10.bam || logMsg "ERROR" "Something wrong with v10 header transformation."
 rm BAM.v10.header.txt
 logMsg "INFO" "Checking that the v10 version is equivalent to the original BAM"
-newSize=$(samtools view -c -@4 sample.v10.bam)
+newSize=$(samtools view -c -@ 8 sample.v10.bam)
 if [[ ! $originalSize -eq $newSize ]];then
         logMsg "ERROR" "The v10 version is different from the original BAM file."
 fi      
 logMsg "INFO" "Splitting the BAM by @RGs"
 samtools split -@ 8 -u sample.v10.noRG.bam:sample.v10.bam -f "sample.v10_%#.%."  sample.v10.bam || logMsg "ERROR" "Splitting didn't work"
 rm sample.v10.bam
-if [[ $(samtools view -c sample.v10.noRG.bam ) == 0 ]];then
+if [[ $(samtools view -c -@ 8 sample.v10.noRG.bam ) == 0 ]];then
         logMsg "INFO" "All reads have a valid RG"
         rm sample.v10.noRG.bam
 else
@@ -106,8 +106,8 @@ do
         samtools addreplacerg -@ 8 -R $RG_ID -o "$currentBAM".rg.bam tmp.bam || logMsg "ERROR" "Something wrong with replacing RG for $RG_ID"
         rm tmp.bam currentBAM.new.header.txt
         logMsg "INFO" "Checking BAM file for old IDs"
-        if [[ $(samtools view "$currentBAM".rg.bam | grep -c $PM_IN) -gt 0 ]];then
-                logMsg "ERROR" "Found old IDs in BAM file. Need to change it. See an example: $(samtools view "$currentBAM" | grep $PM_IN | head -n 2)"
+        if [[ $(samtools view -@ 8 "$currentBAM".rg.bam | grep -c $PM_IN) -gt 0 ]];then
+                logMsg "ERROR" "Found old IDs in BAM file. Need to change it. See an example: $(samtools view -@ 8 "$currentBAM".rg.bam | grep $PM_IN | head -n 2)"
         else
                 logMsg "INFO" "No old IDs found in BAM file."
         fi
@@ -121,17 +121,17 @@ cat bam_files_to_merge | xargs rm || logMsg "ERROR" "Cannot remove temporary BAM
 rm bam_files_to_merge|| logMsg "ERROR" "Cannot remove bam_files_to_merge"
 
 logMsg "INFO" "Checking the final output for PM IDs"
-if [[ $(samtools view -H  -@8 $FILE_OUT | grep -c $PM_IN) -gt 0 ]];then
+if [[ $(samtools view -H  -@ 8 $FILE_OUT | grep -c $PM_IN) -gt 0 ]];then
         logMsg "ERROR" "Found old IDs in the header"
 fi
-if [[ $(samtools view     -@8 $FILE_OUT | grep -c $PM_IN) -gt 0 ]];then
+if [[ $(samtools view     -@ 8 $FILE_OUT | grep -c $PM_IN) -gt 0 ]];then
         logMsg "ERROR" "Found old IDs in the BAM file"
 fi
 logMsg "INFO" "No old IDs found in the header or the BAM file"
 logMsg "INFO" "Indexing the file"
 samtools index -@ 8 $FILE_OUT || logMsg "ERROR" "Indexing failed $FILE_OUT"
 logMsg "DEBUG" "Checking that all reads are included from the original BAM file"
-newSize=$(samtools view -c -@8 $FILE_OUT)
+newSize=$(samtools view -c -@ 8 $FILE_OUT)
 if [[ ! $originalSize -eq $newSize ]];then
         logMsg "ERROR" "The new final version is different from the original BAM file."
 fi  
