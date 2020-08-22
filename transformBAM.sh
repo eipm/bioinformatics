@@ -55,7 +55,8 @@ if [[ ! -e "$FILE_IN" ]];then
     logMsg "ERROR" "Input file does not exists: ($FILE_IN)"
 fi
 DIR_IN="$(pwd)"
-originalSize=$(samtools view -c -@ 4 "$DIR_IN/$FILE_IN")
+logMsg "INFO" "Calculating number of entries in original BAM."
+originalSize=$(samtools view -c -@ 8 "$DIR_IN/$FILE_IN")
 if [[ ! -e "$DIR_OUT" ]];then
     logMsg "WARN" "Output folder does not exists: ($DIR_OUT).\nCreating it now."
     mkdir -p $DIR_OUT
