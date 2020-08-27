@@ -1,7 +1,7 @@
 args = commandArgs(trailingOnly=TRUE)
 # test if there is are 2 arguments: if not, return an error and the actual usage
 if (length(args)!=2) {
-          stop("Usage: Rscript check.R <root_folder> <json_file>.\nThe json file should list all the info of the bucket: aws s3api list-objects-v2 --bucket <bucket> --prefix
+          stop("Usage: Rscript checkFileSize.R <root_folder> <json_file>.\nThe json file should list all the info of the bucket: aws s3api list-objects-v2 --bucket <bucket> --prefix
  <prefix> --endpoint-url <endpoint-url> > <json_file>", call.=FALSE)
 } else if (length(args)==2) {
           # default output file

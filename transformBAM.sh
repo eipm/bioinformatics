@@ -58,7 +58,7 @@ DIR_IN="$(pwd)"
 logMsg "INFO" "Calculating number of entries in original BAM."
 originalSize=$(samtools view -c -@ 8 "$DIR_IN/$FILE_IN")
 if [[ ! -e "$DIR_OUT" ]];then
-    logMsg "WARN" "Output folder does not exists: ($DIR_OUT).\nCreating it now."
+    logMsg "WARN" "Output folder does not exist: ($DIR_OUT).\nCreating it now."
     mkdir -p $DIR_OUT
 fi
 logMsg "DEBUG" "Directory Out: ($DIR_OUT)"
