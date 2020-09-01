@@ -1,6 +1,3 @@
-name: 'Unit testing for the bioinformatics image'
-description: 'This action tests the transformBAM.sh'
-
 # Controls when the action will run. Triggers the workflow on push or pull request
 # events but only for the main branch
 on:
