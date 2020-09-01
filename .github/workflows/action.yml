@@ -30,4 +30,4 @@ jobs:
       - name: Run a multi-line script
         run: |
           docker build --rm -t bioinfo-test -f Dockerfile .
-          docker run --rm --name bioinfo-test-github -v $(pwd)/test-data:/test-data bioinfo-test bash -c "transformBAM.sh --file-in /test-data/Sample_PM1_DNA75_1_P_1_md.bam --dir-out /test-data/output --pm-in PM1 --pm-out TEST1
+          docker run --rm --name bioinfo-test-github -v $(pwd)/test-data:/test-data bioinfo-test bash -c "transformBAM.sh --file-in /test-data/Sample_PM1_DNA75_1_P_1_md.bam --dir-out /test-data/output --pm-in PM1 --pm-out TEST1"
