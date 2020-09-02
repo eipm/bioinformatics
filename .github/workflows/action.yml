@@ -1,5 +1,5 @@
 name: 'Test building and transform BAM'
-description: 'This action performs 2 activities: 1. building the docker image; 2. test the transformBAM.sh'
+description: 'This action tests the transformBAM.sh'
 
 inputs:
     transformBAM-params:
@@ -12,4 +12,4 @@ runs:
   using: 'docker'
   image: 'Dockerfile'
   args:
-    - ${{ inputs.transformBAM-params}}
+    - ${{ inputs.transformBAM-params }}
