@@ -23,12 +23,12 @@ jobs:
       - name: Build the image
         id: build
         # run: docker build --rm -t bioinfo-test -f Dockerfile .
-        run: docker pull eipm/bioinformatics
+        run: docker pull eipm/bioinformatics:latest
 
       # Runs a set of commands using the runners shell
       - name: Test transformBAM
         # uses: docker://bioinfo-test:latest
-        uses: eipm/bioinformatics:latest
+        uses: docker://eipm/bioinformatics:latest
         id: bioinfo-test
         with: 
             entrypoint: transformBAM.sh
