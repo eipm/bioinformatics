@@ -19,15 +19,23 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Checkout
         uses: actions/checkout@v2
-      # Runs a single command using the runners shell
+      
+      - name: Cache the build Steps
+        uses: actions/cache@v1
+        with:
+            path: build_cache
+            key: ${{ runner.OS }}-build-${{ hashFiles('**/package-lock.json') }}
+
+        # Runs a single command using the runners shell
       - name: Build the image
         id: build
         run: docker build --rm -t bioinfo-test -f Dockerfile .
+      
         # run: docker pull eipm/bioinformatics:latest
 
       # Runs a set of commands using the runners shell
       - name: Test transformBAM
-        uses: jobs.build.container.image
+        uses: bioinfo-test
         # uses: docker://eipm/bioinformatics:latest
         id: bioinfo-test
         with: 
