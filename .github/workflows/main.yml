@@ -27,7 +27,7 @@ jobs:
 
       # Runs a set of commands using the runners shell
       - name: Test transformBAM
-        uses: bioinfo-test:latest
+        uses: jobs.build.container.image
         # uses: docker://eipm/bioinformatics:latest
         id: bioinfo-test
         with: 
