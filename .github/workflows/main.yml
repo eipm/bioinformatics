@@ -27,7 +27,8 @@ jobs:
 
       # Runs a set of commands using the runners shell
       - name: Test transformBAM
-        uses: docker://bioinfo-test:latest
+        # uses: docker://bioinfo-test:latest
+        uses: eipm/bioinformatics:latest
         id: bioinfo-test
         with: 
             entrypoint: transformBAM.sh
