@@ -39,10 +39,10 @@ jobs:
         with: 
             entrypoint: transformBAM.sh
             args: "--file-in /test-data/Sample_PM1_DNA75_1_P_1_md.bam --dir-out /test-data/output --pm-in PM1 --pm-out TEST1"
-              --file-in: 'test-data/Sample_PM1_DNA75_1_P_1.md.bam'
-              --dir-out: test-data/output
-              --pm-in: 'PM1'
-              --pm-out: 'TEST1'
+              # --file-in: 'test-data/Sample_PM1_DNA75_1_P_1.md.bam'
+              # --dir-out: test-data/output
+              # --pm-in: 'PM1'
+              # --pm-out: 'TEST1'
       - name: Uploading artifact
         uses: actions/upload-artifact@v1
         with:
