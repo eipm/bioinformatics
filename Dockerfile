@@ -126,6 +126,9 @@ COPY combine_pindel_vcfs.sh ${PROGRAMS}
 COPY transformBAM.sh /usr/local/bin/
 RUN chmod ugo+x /usr/local/bin/transformBAM.sh
 
+### Add test data
+COPY test-data/ /test-data/
+
 #===========================#
 # Security Updates			#
 #===========================#
