@@ -37,13 +37,5 @@ jobs:
               # --dir-out: test-data/output
               # --pm-in: 'PM1'
               # --pm-out: 'TEST1'
-      - name: Collect docker logs
-        uses: jwalton/gh-docker-logs@v1
-        with:
-          dest: './logs'
-      - name: Uploading artifact
-        uses: actions/upload-artifact@v1
-        with:
-          name: bioinformatics logs
-          path: ./logs/*.log
+
         
