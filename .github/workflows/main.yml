@@ -37,9 +37,13 @@ jobs:
               # --dir-out: test-data/output
               # --pm-in: 'PM1'
               # --pm-out: 'TEST1'
+      - name: Collect docker logs
+        uses: jwalton/gh-docker-logs@v1
+        with:
+          dest: './logs'
       - name: Uploading artifact
         uses: actions/upload-artifact@v1
         with:
-          name: Converted BAM file
-          path: /test-data/output/Sample_TEST1_DNA75_1_P_1_md.bam
+          name: bioinformatics logs
+          path: ./logs/bioinformatics.log
         
