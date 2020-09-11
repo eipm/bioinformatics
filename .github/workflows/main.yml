@@ -27,12 +27,12 @@ jobs:
            # Runs a set of commands using the runners shell
       - name: Test transformBAM
         # run:  docker run --rm --name bioinfo-test-github bioinfo-test bash -c "transformBAM.sh --file-in /test-data/Sample_PM1_DNA75_1_P_1_md.bam --dir-out /test-data/output --pm-in PM1 --pm-out TEST1"
-        # uses: ./build_cache/bioinfo-test
-        uses: docker://eipm/bioinformatics:latest
+        uses: ./actions/
+        # uses: docker://eipm/bioinformatics:latest
         id: bioinformatics-test
-        with: 
-            entrypoint: transformBAM.sh
-            args: "--file-in /test-data/Sample_PM1_DNA75_1_P_1.md.bam  --dir-out /test-data/output --pm-in PM1 --pm-out TEST1"
+        # with: 
+        #     entrypoint: transformBAM.sh
+        #     args: "--file-in /test-data/Sample_PM1_DNA75_1_P_1.md.bam  --dir-out /test-data/output --pm-in PM1 --pm-out TEST1"
               # --file-in: 'test-data/Sample_PM1_DNA75_1_P_1.md.bam'
               # --dir-out: test-data/output
               # --pm-in: 'PM1'

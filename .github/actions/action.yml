@@ -10,6 +10,6 @@ inputs:
 
 runs:
   using: 'docker'
-  image: 'bioinfo-test:latest'
+  image: 'Dockerfile'
   args:
     - ${{ inputs.transformBAM-params }}
