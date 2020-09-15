@@ -19,10 +19,6 @@ inputs:
     required: true
     default: 'TEST1'
 
-outputs:
-  file_out:
-    description: 'The output BAM file'
-
 runs:
   using: 'docker'
   image: 'bioinfo-test'

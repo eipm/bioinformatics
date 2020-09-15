@@ -20,13 +20,10 @@ jobs:
       # Builds the image and names it bioinfo-test
       - name: Build the image
         id: build
-        # run: docker build --rm -t bioinfo-test -f Dockerfile .
-        run: docker build --rm -t bioinfo-test -f Dockerfile-test .
+        run: docker build --rm -t bioinfo-test -f Dockerfile .
+        # run: docker build --rm -t bioinfo-test -f Dockerfile-test .
       # Tests transformBAM.sh script with the test data
       - name: Test transformBAM
         id: bioinformatics-test
         # run:  docker run --rm --name bioinfo-test-github bioinfo-test /bin/bash -c "transformBAM.sh --file-in /test-data/Sample_PM1_DNA75_1_P_1_md.bam --dir-out /test-data/output --pm-in PM1 --pm-out TEST1"
         uses: ./.github/actions/
-          
-
-        
