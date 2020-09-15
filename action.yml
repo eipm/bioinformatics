@@ -1,0 +1,15 @@
+name: 'Test-bioinformatics-transform-BAM'
+description: 'This action tests the transformBAM.sh'
+
+inputs:
+    transformBAM-params:
+        --file-in: 'test-data/Sample_PM1_DNA75_1_P_1.md.bam'
+        --dir-out: test-data/output
+        --pm-in: 'PM1'
+        --pm-out: 'TEST1'
+
+runs:
+  using: 'docker'
+  image: 'bioinfo-test'
+  args:
+    - ${{ inputs.transformBAM-params }}
