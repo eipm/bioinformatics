@@ -12,5 +12,5 @@ runs:
   using: 'docker'
   image: 'bioinfo-test'
   args:
-    - ${{ inputs.transformBAM-params }}
-  entrypoint: '${{ github.workspace }}/.github/actions/entrypoint.sh'
+    - ${{ inputs.transformBAM-params.file-in }}
+  entrypoint: ./.github/actions/entrypoint.sh'
