@@ -13,4 +13,4 @@ runs:
   image: 'bioinfo-test'
   args:
     - ${{ inputs.transformBAM-params }}
-  entrypoint: 'echo "here I am"'
+  entrypoint: 'echo 'Hello''
