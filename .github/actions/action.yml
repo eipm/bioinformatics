@@ -2,11 +2,23 @@ name: 'Test-bioinformatics-transform-BAM'
 description: 'This action tests the transformBAM.sh'
 
 inputs:
-    file_in: 'test-data/Sample_PM1_DNA75_1_P_1.md.bam'
-    dir_out: test-data/output
-    pm_in: 'PM1'
-    pm_out: 'TEST1'
-
+    file_in:
+      description: 'Input BAM file'
+      required: true
+      default: 'test-data/Sample_PM1_DNA75_1_P_1.md.bam'
+    dir_out: 
+      description: 'Output directory'
+      required: true
+      default: 'test-data/output'
+    pm_in: 
+      description: 'ID to convert from'
+      required: true
+      default: 'PM1'
+    pm_out: 
+      description: 'Final output ID'
+      required: true
+      default: 'TEST1'
+      
 runs:
   using: 'docker'
   image: 'bioinfo-test'
