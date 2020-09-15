@@ -1,4 +1,4 @@
-name: 'Test building and transform BAM'
+name: 'Test-bioinformatics-transform-BAM'
 description: 'This action tests the transformBAM.sh'
 
 inputs:
@@ -10,6 +10,6 @@ inputs:
 
 runs:
   using: 'docker'
-  image: 'Dockerfile'
+  image: 'bioinfo-test'
   args:
     - ${{ inputs.transformBAM-params }}
