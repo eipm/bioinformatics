@@ -13,4 +13,4 @@ runs:
   image: 'bioinfo-test'
   args:
     - ${{ inputs.transformBAM-params }}
-  entrypoint: '${{ env.GITHUB_WORKSPACE }}/.github/actions/entrypoint.sh'
+  entrypoint: '${{ GITHUB_WORKSPACE }}/.github/actions/entrypoint.sh'
