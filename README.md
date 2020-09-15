@@ -45,4 +45,5 @@ docker run --rm -it --name bioinfo -u $(id -u):$(id -g) -v /path/to/local/folder
 **Tip**: use the `:ro` option to mount read-only folders, e.g. `-v /path/to/local/folder/:/path/to/internal/folder:ro`
 
 ### Transform BAM
+
 This image also include an utility called `transformBAM.sh` that will transform a BAM file by replacing IDs in the header. It will warn if changes need to occur in the content of the BAM file, e.g. the RG group. To use it, simply type `transformBAM.sh` and the usage will be displayed.
