@@ -132,6 +132,9 @@ RUN chmod ugo+x /usr/local/bin/transformBAM.sh
 ### Add test data
 COPY test-data/ /test-data/
 
+### ADD entrypoint data
+COPY .github/actions/entrypoint.sh /
+
 #===========================#
 # Security Updates			#
 #===========================#
