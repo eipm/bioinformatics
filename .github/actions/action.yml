@@ -13,4 +13,4 @@ runs:
   image: 'bioinfo-test'
   args:
     - ${{ inputs.transformBAM-params.file-in }}
-  entrypoint: '/entrypoint.sh '
+  entrypoint: '/entrypoint.sh'
