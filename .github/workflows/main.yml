@@ -26,7 +26,7 @@ jobs:
       - name: Test transformBAM
         id: bioinformatics-test
         # run:  docker run --rm --name bioinfo-test-github bioinfo-test /bin/bash -c "transformBAM.sh --file-in /test-data/Sample_PM1_DNA75_1_P_1_md.bam --dir-out /test-data/output --pm-in PM1 --pm-out TEST1"
-        uses: ./actions/test-bioinformatics@v1 
+        uses: ./.github/actions/test-bioinformatics@v1 
         # with: 
         #   entrypoint: echo
         #   args: 'ciao'
