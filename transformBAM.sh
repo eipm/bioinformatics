@@ -62,7 +62,7 @@ if [[ ! -e "$DIR_OUT" ]];then
     mkdir -p $DIR_OUT
 fi
 logMsg "DEBUG" "Directory Out: ($DIR_OUT)"
-FILE_OUT=$(echo basename($FILE_IN) | sed "s%$PM_IN%$PM_OUT%g")
+FILE_OUT=$(basename $FILE_IN | sed "s%$PM_IN%$PM_OUT%g")
 logMsg "DEBUG" "File Name Out: ($FILE_OUT)"
 
 cd "$DIR_OUT"
