@@ -16,8 +16,10 @@ ENV APP_NAME="bioinformatics" \
 #===========================#
 # Tidyverse Preparation    	#
 #===========================#
-RUN apt-get update && apt-get upgrade -y --fix-missing
-RUN apt-get install build-essential -y && apt-get install -y \
+RUN apt-get update \
+	&& apt-get upgrade -y --fix-missing \
+	&& apt-get install build-essential -y \
+	&& apt-get install -y \
  	vim \
 	emacs \
 	bedtools \
@@ -26,7 +28,8 @@ RUN apt-get install build-essential -y && apt-get install -y \
 	bwa \
 	libncurses5-dev \
 	libbz2-dev \
-	liblzma-dev 
+	liblzma-dev \
+	&& rm -rf /var/lib/apt/lists/*
 
 #===========================#
 # Install BEDTOOLS			#
@@ -128,6 +131,9 @@ RUN chmod ugo+x /usr/local/bin/transformBAM.sh
 
 ### Add test data
 COPY test-data/ /test-data/
+
+### ADD entrypoint data
+COPY .github/actions/entrypoint.sh /
 
 #===========================#
 # Security Updates			#

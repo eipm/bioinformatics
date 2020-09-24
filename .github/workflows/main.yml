@@ -1,0 +1,29 @@
+# Controls when the action will run. Triggers the workflow on push or pull request
+# events but only for the main branch
+on:
+#  push:
+#    branches: [ main ] 
+  pull_request:
+    branches: [ main ]
+
+
+
+jobs:
+  # This workflow contains a single jobs called "build" and "test"
+  build:
+    runs-on: ubuntu-latest
+    name: 'Build and test the bioinformatics image'
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - name: Checkout
+        uses: actions/checkout@v2
+      # Builds the image and names it bioinfo-test
+      - name: Build the image
+        id: build
+        run: docker build --rm -t bioinfo-test -f Dockerfile .
+        # run: docker build --rm -t bioinfo-test -f Dockerfile-test .
+      # Tests transformBAM.sh script with the test data
+      - name: Test transformBAM
+        id: bioinformatics-test
+        # run:  docker run --rm --name bioinfo-test-github bioinfo-test /bin/bash -c "transformBAM.sh --file-in /test-data/Sample_PM1_DNA75_1_P_1_md.bam --dir-out /test-data/output --pm-in PM1 --pm-out TEST1"
+        uses: ./.github/actions/
