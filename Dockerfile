@@ -119,6 +119,18 @@ RUN cd ${PROGRAMS} \
 RUN ln -s ${pindel_dir}/pindel /usr/local/bin/pindel 
 RUN apt-get upgrade -y && apt-get -y clean all
 
+#===========================#
+# Install STAR              #
+#===========================#
+ENV STAR_VERSION 2.7.6a
+ENV star_dir /${PROGRAMS}/STAR-${STAR_VERSION}
+RUN wget -O STAR-${STAR_VERSION}.tar.gz https://github.com/alexdobin/STAR/archive/2.7.6a.tar.gz \
+	&& tar xzf STAR-${STAR_VERSION}.tar.gz -C ${PROGRAMS} \
+	&& rm STAR-${STAR_VERSION}.tar.gz \
+	&& cd ${star_dir}/source \
+	&& make STAR 
+RUN ln -s ${star_dir}/source/STAR /usr/local/bin/
+
 ## Adding common R libraries
 RUN mkdir -p /R/scripts
 ADD installPackages.R /R/scripts
