@@ -3,12 +3,12 @@ FROM rocker/tidyverse:4.0.2 as rstudio
 #===============================#
 # Docker Image Configuration	#
 #===============================#
-LABEL vendor="Englander Institute for Precision Medicine" \
-		description="Bioinformatics Tools" \
-		maintainer="ans2077@med.cornell.edu" \
-		base_image="rocker/tidyverse" \
-		base_image_version="4.0.2" \
-    	base_image_SHA256="sha256:cbc4ee809d594f0f6765be1d0fa046f48dfcda7340b5830473dd28fc71940c3c"
+LABEL org.opencontainers.image.source='https://github.com/eipm/bioinformatics' \
+	vendor="Englander Institute for Precision Medicine" \
+	description="Bioinformatics Tools" \
+	maintainer="ans2077@med.cornell.edu" \
+	base_image="rocker/tidyverse" \
+	base_image_version="4.0.2"
 
 ENV APP_NAME="bioinformatics" \
 	TZ='US/Eastern' \
@@ -20,7 +20,7 @@ RUN apt-get update \
 	&& apt-get upgrade -y --fix-missing \
 	&& apt-get install build-essential -y \
 	&& apt-get install -y \
- 	vim \
+	vim \
 	emacs \
 	bedtools \
 	bcftools \
@@ -112,8 +112,8 @@ RUN cd ${PROGRAMS} \
 # 	&& rm pindel-master.zip \
 # 	&& mv pindel-master pindel \
 # 	&& cd pindel \
-	# && ./INSTALL ${htslib_dir}/htslib-${HTSLIB_VERSION}
-	# && ./INSTALL /${PROGRAMS}/samtools-${SAMTOOLS_VERSION}/htslib-${HTSLIB_VERSION}
+# && ./INSTALL ${htslib_dir}/htslib-${HTSLIB_VERSION}
+# && ./INSTALL /${PROGRAMS}/samtools-${SAMTOOLS_VERSION}/htslib-${HTSLIB_VERSION}
 # RUN ln -s    ${bwa_dir}/bwa /usr/local/bin/bwa \
 # 	&& ln -s ${pindel_dir}/pindel /usr/local/bin/pindel 
 RUN ln -s ${pindel_dir}/pindel /usr/local/bin/pindel 
