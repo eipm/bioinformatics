@@ -57,13 +57,13 @@ jobs:
           docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
           docker push $IMAGE_ID:$VERSION
 
-        - name: Login to EIPM DockerHub
+      - name: Login to EIPM DockerHub
           uses: docker/login-action@v1
           with:
             username: ${{ secrets.EIPM_DOCKER_HUB_USERNAME }}
             password: ${{ secrets.EIPM_DOCKER_HUB_TOKEN }}
         
-        - name: Push image to EIPM Docker Hub
+      - name: Push image to EIPM Docker Hub
           run: |
             IMAGE_ID=eipm/$IMAGE_NAME
   
@@ -85,13 +85,13 @@ jobs:
             docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
             docker push $IMAGE_ID:$VERSION
 
-        - name: Login to CGEN DockerHub
+      - name: Login to CGEN DockerHub
           uses: docker/login-action@v1
           with:
             username: ${{ secrets.CGEN_DOCKER_HUB_USERNAME }}
             password: ${{ secrets.CGEN_DOCKER_HUB_TOKEN }}
         
-        - name: Push image to CGEN Docker Hub
+      - name: Push image to CGEN Docker Hub
           run: |
             IMAGE_ID=cgen/$IMAGE_NAME
   
