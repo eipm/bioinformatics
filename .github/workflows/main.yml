@@ -6,8 +6,6 @@ on:
   pull_request:
     branches: [ main ]
 
-
-
 jobs:
   # This workflow contains a single jobs called "build" and "test"
   build:
