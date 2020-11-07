@@ -2,7 +2,7 @@
 
 This application provides some of the basic bioinformatics tools for development, debugging, and troubleshooting applications.
 
-[![Actions Status](https://github.com/eipm/bioinformatics/workflows/Docker/badge.svg)](https://github.com/eipm/bioinformatics/actions) [![Github](https://img.shields.io/badge/github-1.3.1-green?style=flat&logo=github)](https://github.com/eipm/bioinformatics) [![Docker Hub](https://img.shields.io/badge/docker%20hub-1.3.1-blue?style=flat&logo=docker)](https://hub.docker.com/repository/docker/eipm/bioinformatics) [![GitHub Container Registry](https://img.shields.io/badge/GitHub%20Container%20Registry-1.3.1-blue?style=flat&logo=docker)](https://github.com/orgs/eipm/packages/container/packa
+[![Actions Status](https://github.com/eipm/bioinformatics/workflows/Docker/badge.svg)](https://github.com/eipm/bioinformatics/actions) [![Github](https://img.shields.io/badge/github-1.3.1-green?style=flat&logo=github)](https://github.com/eipm/bioinformatics) [![EIPM Docker Hub](https://img.shields.io/badge/EIPM%20docker%20hub-1.3.1-blue?style=flat&logo=docker)](https://hub.docker.com/repository/docker/eipm/bioinformatics) [![CGEN Docker Hub](https://img.shields.io/badge/CGEN%20docker%20hub-1.3.1-blue?style=flat&logo=docker)](https://hub.docker.com/repository/docker/cgen/bioinformatics) [![GitHub Container Registry](https://img.shields.io/badge/GitHub%20Container%20Registry-1.3.1-blue?style=flat&logo=docker)](https://github.com/orgs/eipm/packages/container/packa
 
 It includes:
 
