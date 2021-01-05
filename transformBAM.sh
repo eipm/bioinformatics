@@ -6,7 +6,7 @@ fi
 PROGRAM=$0
 
 usage() {
-    echo -e "Usage:\tbash $PROGRAM [-i|--file-in] [-o|--dir-out] [-p|--pm-in] [-r|--pm-out]"
+    echo -e "Usage:\tbash $PROGRAM [-i|--file-in] [-o|--dir-out] -p|--pm-in] [-r|--pm-out] [-f|--file-out]"
 }
 cleanUp() {
         if [[ -e BAM.new.header.sam.txt ]];then
@@ -25,7 +25,7 @@ logMsg() {
         fi
 }
 
-if [[ $# -ne 8 ]];then
+if [[ $# -lt 8 ]];then
     usage
     cleanUp 127
 fi
@@ -43,6 +43,9 @@ while [ "$1" != "" ]; do
                             ;;
         -r | --pm-out )     shift 
                             PM_OUT=$1
+                            ;;
+        -f | --file-out )   shift
+                            FILE_NAME_OUT=$1
                             ;;
         * )                 usage
                             cleanUp 0
@@ -62,7 +65,7 @@ if [[ ! -e "$DIR_OUT" ]];then
     mkdir -p $DIR_OUT
 fi
 logMsg "DEBUG" "Directory Out: ($DIR_OUT)"
-FILE_OUT=$(basename $FILE_IN | sed "s%$PM_IN%$PM_OUT%g")
+[[ -z "$FILE_NAME_OUT" ]] && FILE_OUT=$(basename $FILE_IN | sed "s%$PM_IN%$PM_OUT%g") || FILE_OUT="$FILE_NAME_OUT"
 logMsg "DEBUG" "File Name Out: ($FILE_OUT)"
 
 cd "$DIR_OUT"
