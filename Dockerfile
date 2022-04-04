@@ -1,4 +1,4 @@
-FROM rocker/tidyverse:4.0.2 as rstudio
+FROM rocker/tidyverse:4.1.2 as rstudio
 
 #===============================#
 # Docker Image Configuration	#
@@ -8,7 +8,7 @@ LABEL org.opencontainers.image.source='https://github.com/eipm/bioinformatics' \
 	description="Bioinformatics Tools" \
 	maintainer="ans2077@med.cornell.edu" \
 	base_image="rocker/tidyverse" \
-	base_image_version="4.0.2"
+	base_image_version="4.1.2"
 
 ENV APP_NAME="bioinformatics" \
 	TZ='US/Eastern' \
@@ -29,6 +29,7 @@ RUN apt-get update \
 	libncurses5-dev \
 	libbz2-dev \
 	liblzma-dev \
+	python-htseq \
 	&& rm -rf /var/lib/apt/lists/*
 
 #===========================#
@@ -117,7 +118,6 @@ RUN cd ${PROGRAMS} \
 # RUN ln -s    ${bwa_dir}/bwa /usr/local/bin/bwa \
 # 	&& ln -s ${pindel_dir}/pindel /usr/local/bin/pindel 
 RUN ln -s ${pindel_dir}/pindel /usr/local/bin/pindel 
-RUN apt-get upgrade -y && apt-get -y clean all
 
 #===========================#
 # Install STAR              #
@@ -130,6 +130,29 @@ RUN wget -O STAR-${STAR_VERSION}.tar.gz https://github.com/alexdobin/STAR/archiv
 	&& cd ${star_dir}/source \
 	&& make STAR 
 RUN ln -s ${star_dir}/source/STAR /usr/local/bin/
+RUN apt-get upgrade -y && apt-get -y clean all
+
+## Multi-stage build
+FROM rocker/tidyverse:4.1.2
+
+ENV APP_NAME="bioinformatics" \
+	TZ='US/Eastern' \
+	PROGRAMS="opt" \
+	STAR_VERSION='2.7.6a' \
+	SAMTOOLS_VERSION='1.9' \
+	HTSLIB_VERSION='1.9'
+
+RUN apt-get update \
+	&& apt-get upgrade -y --fix-missing \
+	&& apt-get -y clean all
+	
+COPY --from=rstudio /usr/local /usr/local
+COPY --from=rstudio /usr/lib /usr/lib
+COPY --from=rstudio /usr/lib64 /usr/lib64
+COPY --from=rstudio /usr/bin /usr/bin
+COPY --from=rstudio /${PROGRAMS}/STAR-${STAR_VERSION} /${PROGRAMS}/STAR-${STAR_VERSION}
+COPY --from=rstudio /${PROGRAMS}/pindel/pindel /${PROGRAMS}/pindel/pindel
+COPY --from=rstudio /${PROGRAMS}/samtools-${SAMTOOLS_VERSION} /${PROGRAMS}/samtools-${SAMTOOLS_VERSION}
 
 ## Adding common R libraries
 RUN mkdir -p /R/scripts
