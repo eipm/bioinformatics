@@ -60,7 +60,7 @@ RUN wget -O samtools-${SAMTOOLS_VERSION}.tar.bz2 https://github.com/samtools/sam
 	&& make \
 	&& make install
 # #===========================#
-# # Install BCFTOOLS			#
+# # Install BCFTOOLS          #
 # #===========================#
 # ENV BCFTOOLS_VERSION 1.8
 # ENV bcftools_dir /${PROGRAMS}/bcftools-${BCFTOOLS_VERSION}
