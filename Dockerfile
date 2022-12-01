@@ -1,4 +1,4 @@
-FROM rocker/tidyverse:4.1.2 as rstudio
+FROM rocker/tidyverse:4.2.2 as rstudio
 
 #===============================#
 # Docker Image Configuration	#
@@ -8,7 +8,7 @@ LABEL org.opencontainers.image.source='https://github.com/eipm/bioinformatics' \
 	description="Bioinformatics Tools" \
 	maintainer="ans2077@med.cornell.edu" \
 	base_image="rocker/tidyverse" \
-	base_image_version="4.1.2"
+	base_image_version="4.2.2"
 
 ENV APP_NAME="bioinformatics" \
 	TZ='US/Eastern' \
@@ -133,7 +133,7 @@ RUN ln -s ${star_dir}/source/STAR /usr/local/bin/
 RUN apt-get upgrade -y && apt-get -y clean all
 
 ## Multi-stage build
-FROM rocker/tidyverse:4.1.2
+FROM rocker/tidyverse:4.2.2
 
 ENV APP_NAME="bioinformatics" \
 	TZ='US/Eastern' \
