@@ -149,9 +149,13 @@ RUN apt-get update \
 COPY --from=rstudio /usr/local /usr/local
 COPY --from=rstudio /usr/lib /usr/lib
 COPY --from=rstudio /usr/lib64 /usr/lib64
+RUN true
 COPY --from=rstudio /usr/bin /usr/bin
+RUN true
 COPY --from=rstudio /${PROGRAMS}/STAR-${STAR_VERSION} /${PROGRAMS}/STAR-${STAR_VERSION}
+RUN true
 COPY --from=rstudio /${PROGRAMS}/pindel/pindel /${PROGRAMS}/pindel/pindel
+RUN true
 COPY --from=rstudio /${PROGRAMS}/samtools-${SAMTOOLS_VERSION} /${PROGRAMS}/samtools-${SAMTOOLS_VERSION}
 
 ## Adding common R libraries
