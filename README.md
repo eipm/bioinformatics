@@ -2,7 +2,7 @@
 
 This application provides some of the basic bioinformatics tools for development, debugging, and troubleshooting applications.
 
-[![Actions Status](https://github.com/eipm/bioinformatics/workflows/Docker/badge.svg)](https://github.com/eipm/bioinformatics/actions) [![Github](https://img.shields.io/badge/github-1.3.1-green?style=flat&logo=github)](https://github.com/eipm/bioinformatics) [![EIPM Docker Hub](https://img.shields.io/badge/EIPM%20docker%20hub-1.3.1-blue?style=flat&logo=docker)](https://hub.docker.com/repository/docker/eipm/bioinformatics) [![GitHub Container Registry](https://img.shields.io/badge/GitHub%20Container%20Registry-1.3.1-blue?style=flat&logo=docker)](https://github.com/orgs/eipm/packages/container/package/bioinformatics)
+[![Actions Status](https://github.com/eipm/bioinformatics/workflows/Docker/badge.svg)](https://github.com/eipm/bioinformatics/actions) [![Github](https://img.shields.io/badge/github-latest-green?style=flat&logo=github)](https://github.com/eipm/bioinformatics) [![EIPM Docker Hub](https://img.shields.io/badge/EIPM%20docker%20hub-latest-blue?style=flat&logo=docker)](https://hub.docker.com/repository/docker/eipm/bioinformatics) [![GitHub Container Registry](https://img.shields.io/badge/GitHub%20Container%20Registry-latest-blue?style=flat&logo=docker)](https://github.com/orgs/eipm/packages/container/package/bioinformatics)
 
 It includes:
 
@@ -11,11 +11,9 @@ It includes:
 * bcftools (installed from distro with apt install: current 1.13 (using htslib 1.13+ds)
 * vcftools (installed from distro with apt install: current 0.1.16)
 * bwa (installed from distro with apt install: current 0.7.17-r1188)
-* samtools (1.9 (using htslib 1.9))
+* samtools (1.19 (using htslib 1.19))
 * pindel (latest:0.2.5b9, 20160729)
 * STAR (2.7.6a)
-
-The installed tools are the latest available as of Dec 5, 2022.
 
 **Note**: *pindel* includes a fix from a non-merged branch (see [Dockerfile](./Dockerfile)).
 
@@ -46,10 +44,6 @@ docker run --rm -it --name bioinfo -u $(id -u):$(id -g) -v /path/to/local/folder
 ```
 
 **Tip**: use the `:ro` option to mount read-only folders, e.g. `-v /path/to/local/folder/:/path/to/internal/folder:ro`
-
-### Transform BAM
-
-This image also include an utility called `transformBAM.sh` that will transform a BAM file by replacing IDs in the header. It will warn if changes need to occur in the content of the BAM file, e.g. the RG group. To use it, simply type `transformBAM.sh` and the usage will be displayed.
 
 ### Combine pindel VCFs
 This utility `combine_pindel_vcfs.sh` takes multiple pindel results and merge them [TBDs]
