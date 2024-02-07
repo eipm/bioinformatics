@@ -29,8 +29,8 @@ RUN apt-get update \
 #===========================#
 # Install SAMTOOLS & HTSLIB #
 #===========================#
-ENV SAMTOOLS_VERSION 1.9
-ENV HTSLIB_VERSION 1.9
+ENV SAMTOOLS_VERSION 1.19
+ENV HTSLIB_VERSION 1.19
 ENV samtools_dir /${PROGRAMS}/samtools-${SAMTOOLS_VERSION}
 ENV htslib_dir ${samtools_dir}/htslib-${HTSLIB_VERSION}
 RUN wget -O samtools-${SAMTOOLS_VERSION}.tar.bz2 https://github.com/samtools/samtools/releases/download/${SAMTOOLS_VERSION}/samtools-${SAMTOOLS_VERSION}.tar.bz2 \
@@ -75,8 +75,8 @@ ENV APP_NAME="bioinformatics" \
 	TZ='US/Eastern' \
 	PROGRAMS="opt" \
 	STAR_VERSION='2.7.6a' \
-	SAMTOOLS_VERSION='1.9' \
-	HTSLIB_VERSION='1.9'
+	SAMTOOLS_VERSION='1.19' \
+	HTSLIB_VERSION='1.19'
 
 RUN apt-get update \
 	&& apt-get upgrade -y --fix-missing \
