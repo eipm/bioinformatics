@@ -101,6 +101,3 @@ RUN Rscript /R/scripts/installPackages.R
 
 ### Add utilities file
 COPY combine_pindel_vcfs.sh ${PROGRAMS}
-
-### ADD entrypoint data
-COPY .github/actions/entrypoint.sh /
