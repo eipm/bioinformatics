@@ -29,8 +29,8 @@ RUN apt-get update \
 #===========================#
 # Install SAMTOOLS & HTSLIB #
 #===========================#
-ENV SAMTOOLS_VERSION 1.9
-ENV HTSLIB_VERSION 1.9
+ENV SAMTOOLS_VERSION 1.19
+ENV HTSLIB_VERSION 1.19
 ENV samtools_dir /${PROGRAMS}/samtools-${SAMTOOLS_VERSION}
 ENV htslib_dir ${samtools_dir}/htslib-${HTSLIB_VERSION}
 RUN wget -O samtools-${SAMTOOLS_VERSION}.tar.bz2 https://github.com/samtools/samtools/releases/download/${SAMTOOLS_VERSION}/samtools-${SAMTOOLS_VERSION}.tar.bz2 \
@@ -75,8 +75,8 @@ ENV APP_NAME="bioinformatics" \
 	TZ='US/Eastern' \
 	PROGRAMS="opt" \
 	STAR_VERSION='2.7.6a' \
-	SAMTOOLS_VERSION='1.9' \
-	HTSLIB_VERSION='1.9'
+	SAMTOOLS_VERSION='1.19' \
+	HTSLIB_VERSION='1.19'
 
 RUN apt-get update \
 	&& apt-get upgrade -y --fix-missing \
@@ -101,25 +101,3 @@ RUN Rscript /R/scripts/installPackages.R
 
 ### Add utilities file
 COPY combine_pindel_vcfs.sh ${PROGRAMS}
-COPY transformBAM.sh /usr/local/bin/
-RUN chmod ugo+x /usr/local/bin/transformBAM.sh
-
-### Add test data
-COPY test-data/ /test-data/
-
-### ADD entrypoint data
-COPY .github/actions/entrypoint.sh /
-
-#===========================#
-# Security Updates			#
-#===========================#
-# ENV GHOSTSCRIPT_VER 9.52
-# ENV GS_VER 952
-# ENV GHOSTSCRIPT_DIR /${PROGRAMS}/ghostscript-${GHOSTSCRIPT_VER}
-# RUN wget -O ghostscript-${GHOSTSCRIPT_VER}.tar.gz https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs952/ghostscript-9.52.tar.gz \
-# 	&& tar -vxzf ghostscript-${GHOSTSCRIPT_VER}.tar.gz -C ${PROGRAMS} \
-# 	&& rm ghostscript-${GHOSTSCRIPT_VER}.tar.gz \
-# 	&& cd ${GHOSTSCRIPT_DIR} \
-# 	&& ./configure \
-# 	&& make \
-# 	&& make install

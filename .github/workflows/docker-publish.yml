@@ -14,7 +14,6 @@ on:
   pull_request:
 
 env:
-  # TODO: Change variable to your image's name.
   IMAGE_NAME: bioinformatics
 
 jobs:
@@ -27,61 +26,137 @@ jobs:
     if: github.event_name == 'push'
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
+        with:
+          lfs: true
+      - name: Checkout LFS objects
+        run: git lfs checkout
+      - name: Set Date
+        run: echo "TODAYS_DATE=$(date +'%Y%m%d')" >> $GITHUB_ENV
 
-      - name: Build image
-        run: docker build . --file Dockerfile --tag $IMAGE_NAME
+      - name: Prepare tags
+        id: prep
+        run: |
+
+          # Docker Registries
+          GHCR_IMAGE_NAME="ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}"
+          DOCKER_HUB_IMAGE_NAME="${{ github.repository_owner }}/${{ env.IMAGE_NAME }}"
+
+          TAGS=""
+          FINAL_TAGS=""
+          
+          # Identify Tags
+          # Type of tags:
+          # 1. Scenario 1 - x.y.z.patchedYYYYMMDD
+          # 2. Scenario 2 - Semver Tags x.y.z
+          # 3. Scenario 3 - Main Branch
+          # 4. Scenario 4 - Branches
+
+          if [[ $GITHUB_REF == refs/tags/* ]]; then
+            # If this is a tag push, use the tag name (stripping 'refs/tags/')
+            FULL_TAG=${GITHUB_REF#refs/tags/}
+      
+            # Remove leading 'v' from tag if present
+            if [[ $FULL_TAG == v* ]]; then
+              FULL_TAG=${FULL_TAG#v}
+            fi
+      
+            # Scenario 1 - x.y.z.patchedYYYYMMDD
+            # Tags
+            # 1. x.y.z.patchedYYYYMMDD
+            # 2. x.y.z
+            # 3. x.y
+            # 4. x
+            if [[ $FULL_TAG =~ (.*)\.patched[0-9]+ ]]; then
+              # Extract the base tag without the .patched segment
+              BASE_TAG=${BASH_REMATCH[1]}
+
+              if [[ $BASE_TAG =~ ^([0-9]+)\.([0-9]+)\.([0-9]+)$ ]]; then
+                MAJOR=${BASH_REMATCH[1]}
+                MINOR=${BASH_REMATCH[2]}
+                PATCH=${BASH_REMATCH[3]}
+
+                TAGS="$FULL_TAG,$BASE_TAG,$MAJOR.$MINOR.$PATCH,$MAJOR.$MINOR,$MAJOR"
+              fi
+            else
+              # Scenario 2 - Semver Tags x.y.z
+              # Tags
+              # 1. x.y.z
+              # 2. x.y
+              # 3. x
+              if [[ $FULL_TAG =~ ^([0-9]+)\.([0-9]+)\.([0-9]+)$ ]]; then
+                MAJOR=${BASH_REMATCH[1]}
+                MINOR=${BASH_REMATCH[2]}
+                PATCH=${BASH_REMATCH[3]}
+
+                TAGS="$MAJOR.$MINOR.$PATCH,$MAJOR.$MINOR,$MAJOR"
+              fi
+            fi
+          elif [[ $GITHUB_REF == refs/heads/main ]]; then
+            # Scenario 3 - Main Branch
+            # If this is a push to main, use 'latest'
+            TAGS="latest"
+          else
+            # Scenario 4 - Branches
+            # Otherwise, use the branch name, replacing non-alphanumeric characters with underscores
+            TAG=$(echo ${GITHUB_REF#refs/heads/} | sed 's/[^a-zA-Z0-9]/_/g')
+            TAGS=$TAG
+          fi
+
+          # For each tag, prepend the registry name and output a newline-separated list
+          for tag in $(echo "$TAGS" | tr ',' '\n'); do
+            FINAL_TAGS="$FINAL_TAGS $GHCR_IMAGE_NAME:$tag,"
+            FINAL_TAGS="$FINAL_TAGS $DOCKER_HUB_IMAGE_NAME:$tag,"
+          done
+
+          FINAL_TAGS=${FINAL_TAGS%,}
+
+          echo "tags=${FINAL_TAGS}" >> $GITHUB_OUTPUT
+
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          # list of Docker images to use as base name for tags
+          images: |
+            ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}
+            ${{ github.repository_owner }}/${{ env.IMAGE_NAME }}
+          labels: 
+            org.opencontainers.image.title=${{ env.IMAGE_NAME }}
+            org.opencontainers.image.description=Bioinformatics Tools
+            org.opencontainers.image.vendor=Englander Institute for Precision Medicine
+            maintainer=Andrea Sboner <ans2077@med.cornell.edu>
+            org.opencontainers.image.authors=Andrea Sboner <ans2077@med.cornell.edu>
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
       - name: Log into GitHub Container Registry
-        run: echo "${{ secrets.GHCR_TOKEN }}" | docker login https://ghcr.io -u ${{ secrets.GHCR_SVC_ACCOUNT }} --password-stdin
-
-      - name: Push image to GitHub Container Registry
-        run: |
-          IMAGE_ID=ghcr.io/${{ github.repository_owner }}/$IMAGE_NAME
-
-          # Change all uppercase to lowercase
-          IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
-
-          # Strip git ref prefix from version
-          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
-
-          # Strip "v" prefix from tag name
-          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
-
-          # Use Docker `latest` tag convention
-          [ "$VERSION" == "main" ] && VERSION=latest
-
-          echo IMAGE_ID=$IMAGE_ID
-          echo VERSION=$VERSION
-
-          docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
-          docker push $IMAGE_ID:$VERSION
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ secrets.GHCR_SVC_ACCOUNT }}
+          password: ${{ secrets.GHCR_TOKEN }}
 
       - name: Login to EIPM DockerHub
-        uses: docker/login-action@v1
+        uses: docker/login-action@v3
         with:
           username: ${{ secrets.EIPM_DOCKER_HUB_USERNAME }}
           password: ${{ secrets.EIPM_DOCKER_HUB_TOKEN }}
+
+      - name: Build and push to Docker Hub and GitHub Container Registry
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          platforms: linux/amd64
+          file: ./Dockerfile
+          sbom: true
+          push: true
+          provenance: mode=max
+          tags: ${{ steps.prep.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=registry,ref=ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:cache
+          cache-to: type=registry,ref=ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:cache,mode=max
         
-      - name: Push image to EIPM Docker Hub
-        run: |
-          IMAGE_ID=eipm/$IMAGE_NAME
-
-          # Change all uppercase to lowercase
-          IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
-
-          # Strip git ref prefix from version
-          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
-
-          # Strip "v" prefix from tag name
-          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
-
-          # Use Docker `latest` tag convention
-          [ "$VERSION" == "main" ] && VERSION=latest
-
-          echo IMAGE_ID=$IMAGE_ID
-          echo VERSION=$VERSION
-
-          docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
-          docker push $IMAGE_ID:$VERSION
-  

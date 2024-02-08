@@ -1,3 +1,0 @@
-FROM alpine
-CMD "echo 'Alpine'"
-COPY .github/actions/entrypoint.sh /
