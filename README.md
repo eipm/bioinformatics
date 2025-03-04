@@ -4,6 +4,14 @@ This application provides some of the basic bioinformatics tools for development
 
 [![Actions Status](https://github.com/eipm/bioinformatics/workflows/Docker/badge.svg)](https://github.com/eipm/bioinformatics/actions) [![Github](https://img.shields.io/badge/github-1.5.1-green?style=flat&logo=github)](https://github.com/eipm/bioinformatics) [![EIPM Docker Hub](https://img.shields.io/badge/EIPM%20docker%20hub-1.5.1-blue?style=flat&logo=docker)](https://hub.docker.com/repository/docker/eipm/bioinformatics) [![GitHub Container Registry](https://img.shields.io/badge/GitHub%20Container%20Registry-1.5.1-blue?style=flat&logo=docker)](https://github.com/orgs/eipm/packages/container/package/bioinformatics)
 
+## 🤝 License
+See [LICENSE](./LICENSE)
+
+## 📚 How to Cite
+> Andrea Sboner, Alexandros Sigaras, Andrea Sboner Lab, Evan Fernandez, RadiumPlatypus, & kathryn gorski. (2025). eipm/bioinformatics: v1.5.1 (v1.5.1.patched20250304). Zenodo. [https://doi.org/10.5281/zenodo.14968809](https://doi.org/10.5281/zenodo.14968809)
+
+## Components
+
 It includes:
 
 * R 4.2.2
