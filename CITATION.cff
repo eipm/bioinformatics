@@ -1,0 +1,28 @@
+cff-version: 1.2.0
+title: Bridge2AI Voice Docs
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: dataset
+authors:
+  - family-names: Sboner
+    given-names: Andrea
+    affiliation: Weill Cornell Medicine (WCM)
+    orcid: 'https://orcid.org/0000-0001-6915-3070'
+  - given-names: Alexandros
+    family-names: Sigaras
+    email: als2076@med.cornell.edu
+    affiliation: Weill Cornell Medicine (WCM)
+    orcid: 'https://orcid.org/0000-0002-7607-559X'
+  - family-names: Gorsky
+    given-names: Kathryn
+    affiliation: Weill Cornell Medicine (WCM)
+    orcid: 'https://orcid.org/0009-0005-6277-9691'
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.12760724
+repository-code: 'https://github.com/eipm/bioinformatics'
+keywords:
+  - Bioinformatics
+  - Precision Medicine
+license: MIT
