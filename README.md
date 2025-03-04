@@ -2,7 +2,7 @@
 
 This application provides some of the basic bioinformatics tools for development, debugging, and troubleshooting applications.
 
-[![Actions Status](https://github.com/eipm/bioinformatics/workflows/Docker/badge.svg)](https://github.com/eipm/bioinformatics/actions) [![Github](https://img.shields.io/badge/github-latest-green?style=flat&logo=github)](https://github.com/eipm/bioinformatics) [![EIPM Docker Hub](https://img.shields.io/badge/EIPM%20docker%20hub-latest-blue?style=flat&logo=docker)](https://hub.docker.com/repository/docker/eipm/bioinformatics) [![GitHub Container Registry](https://img.shields.io/badge/GitHub%20Container%20Registry-latest-blue?style=flat&logo=docker)](https://github.com/orgs/eipm/packages/container/package/bioinformatics)
+[![Actions Status](https://github.com/eipm/bioinformatics/workflows/Docker/badge.svg)](https://github.com/eipm/bioinformatics/actions) [![Github](https://img.shields.io/badge/github-1.5.1-green?style=flat&logo=github)](https://github.com/eipm/bioinformatics) [![EIPM Docker Hub](https://img.shields.io/badge/EIPM%20docker%20hub-1.5.1-blue?style=flat&logo=docker)](https://hub.docker.com/repository/docker/eipm/bioinformatics) [![GitHub Container Registry](https://img.shields.io/badge/GitHub%20Container%20Registry-1.5.1-blue?style=flat&logo=docker)](https://github.com/orgs/eipm/packages/container/package/bioinformatics)
 
 It includes:
 
