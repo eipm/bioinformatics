@@ -69,21 +69,6 @@ RUN wget -O STAR-${STAR_VERSION}.tar.gz https://github.com/alexdobin/STAR/archiv
 RUN apt-get upgrade -y && apt-get -y clean all
 
 
-#===========================#
-# Install MAFFT             #
-#===========================#
-# tabix included in htslib
-ENV MAFFT_VERSION="7.490"
-ENV mafft_dir /${PROGRAMS}/mafft-${MAFFT_VERSION}
-RUN  wget --no-check-certificate -O mafft-${MAFFT_VERSION}-without-extensions-src.tgz https://mafft.cbrc.jp/alignment/software/mafft-${MAFFT_VERSION}-without-extensions-src.tgz \
-     && tar zxf mafft-${MAFFT_VERSION}-without-extensions-src.tgz \
-     && rm mafft-${MAFFT_VERSION}-without-extensions-src.tgz \
-     && cd mafft-${MAFFT_VERSION}-without-extensions/core \
-     && make clean \
-     && make \
-     && make install
-     
-
 ## Multi-stage build
 FROM rocker/tidyverse:4.5.1
 
@@ -110,6 +95,20 @@ COPY --from=rstudio /usr/local/bin /usr/local/bin
 RUN true
 COPY --from=rstudio /${PROGRAMS}/samtools-${SAMTOOLS_VERSION} /${PROGRAMS}/samtools-${SAMTOOLS_VERSION}
 
+     
+
+#===========================#
+# Install MAFFT             #
+#===========================#
+## this needs to be here b/c mafft is installed to /usr/bin, and I don't want to clobber anything by
+## copying that directory
+
+ENV MAFFT_VERSION="7.526"
+RUN  wget --no-check-certificate -O mafft_${MAFFT_VERSION}-1_amd64.deb https://mafft.cbrc.jp/alignment/software/mafft_${MAFFT_VERSION}-1_amd64.deb \
+     && dpkg -i mafft_${MAFFT_VERSION}-1_amd64.deb \
+     && rm mafft_${MAFFT_VERSION}-1_amd64.deb
+
+
 ## Adding common R libraries
 RUN mkdir -p /R/scripts
 ADD installPackages.R /R/scripts
@@ -117,3 +116,6 @@ RUN Rscript /R/scripts/installPackages.R
 
 ### Add utilities file
 COPY combine_pindel_vcfs.sh ${PROGRAMS}
+
+
+
