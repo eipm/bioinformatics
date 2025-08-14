@@ -5,6 +5,7 @@ on:
     # Publish `main` as Docker `latest` image.
     branches:
       - main
+      - develop
 
     # Publish `v1.2.3` tags as releases.
     tags:
@@ -13,8 +14,17 @@ on:
   # Run tests for any PRs.
   pull_request:
 
+permissions:
+  contents: read
+  packages: write
+  actions: write
+
 env:
+  # TODO: Change variable to your image's name.
   IMAGE_NAME: bioinformatics
+  IMAGE_DESCRIPTION: 'baseline docker image that provides bioinformatics utilities necessary for EIPM'
+  IMAGE_AUTHORS: 'Andrea Sboner <ans2077@med.cornell.edu>'
+  IMAGE_MAINTAINER: 'Andrea Sboner <ans2077@med.cornell.edu>'
 
 jobs:
 
@@ -121,12 +131,12 @@ jobs:
           images: |
             ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}
             ${{ github.repository_owner }}/${{ env.IMAGE_NAME }}
-          labels: 
+          labels: |
             org.opencontainers.image.title=${{ env.IMAGE_NAME }}
-            org.opencontainers.image.description=Bioinformatics Tools
+            org.opencontainers.image.description=${{ env.IMAGE_DESCRIPTION }}
             org.opencontainers.image.vendor=Englander Institute for Precision Medicine
-            maintainer=Andrea Sboner <ans2077@med.cornell.edu>
-            org.opencontainers.image.authors=Andrea Sboner <ans2077@med.cornell.edu>
+            maintainer=${{ env.IMAGE_MAINTAINER }}
+            org.opencontainers.image.authors=${{ env.IMAGE_AUTHORS }}
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -159,4 +169,3 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=registry,ref=ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:cache
           cache-to: type=registry,ref=ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:cache,mode=max
-        
