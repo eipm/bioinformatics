@@ -69,6 +69,14 @@ RUN wget -O STAR-${STAR_VERSION}.tar.gz https://github.com/alexdobin/STAR/archiv
 RUN apt-get upgrade -y && apt-get -y clean all
 
 
+#===========================#
+# Install MAFFT             #
+#===========================#
+ENV MAFFT_VERSION="7.526"
+RUN  wget --no-check-certificate -O mafft_${MAFFT_VERSION}-1_amd64.deb https://mafft.cbrc.jp/alignment/software/mafft_${MAFFT_VERSION}-1_amd64.deb \
+     && dpkg -i mafft_${MAFFT_VERSION}-1_amd64.deb \
+     && rm mafft_${MAFFT_VERSION}-1_amd64.deb
+
 ## Multi-stage build
 FROM rocker/tidyverse:4.5.1
 
@@ -95,18 +103,14 @@ COPY --from=rstudio /usr/local/bin /usr/local/bin
 RUN true
 COPY --from=rstudio /${PROGRAMS}/samtools-${SAMTOOLS_VERSION} /${PROGRAMS}/samtools-${SAMTOOLS_VERSION}
 
-     
+## copy mafft over
+COPY --from=rstudio /usr/bin/mafft /usr/bin/
+COPY --from=rstudio /usr/bin/mafft-homologs.rb /usr/bin/mafft-homologs.rb
+COPY --from=rstudio /usr/bin/mafft-sparsecore.rb /usr/bin/mafft-sparsecore.rb
+COPY --from=rstudio /usr/bin/mafft-profile /usr/bin/mafft-profile 
+RUN mkdir /usr/libexec/mafft
+COPY --from=rstudio /usr/libexec/mafft/ /usr/libexec/mafft/
 
-#===========================#
-# Install MAFFT             #
-#===========================#
-## this needs to be here b/c mafft is installed to /usr/bin, and I don't want to clobber anything by
-## copying that directory
-
-ENV MAFFT_VERSION="7.526"
-RUN  wget --no-check-certificate -O mafft_${MAFFT_VERSION}-1_amd64.deb https://mafft.cbrc.jp/alignment/software/mafft_${MAFFT_VERSION}-1_amd64.deb \
-     && dpkg -i mafft_${MAFFT_VERSION}-1_amd64.deb \
-     && rm mafft_${MAFFT_VERSION}-1_amd64.deb
 
 
 ## Adding common R libraries
