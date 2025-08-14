@@ -1,4 +1,4 @@
-FROM rocker/tidyverse:4.2.2 as rstudio
+FROM rocker/tidyverse:4.5.1 as rstudio
 
 #===============================#
 # Docker Image Configuration	#
@@ -68,8 +68,24 @@ RUN wget -O STAR-${STAR_VERSION}.tar.gz https://github.com/alexdobin/STAR/archiv
 	&& cp STAR /usr/local/bin/
 RUN apt-get upgrade -y && apt-get -y clean all
 
+
+#===========================#
+# Install MAFFT             #
+#===========================#
+# tabix included in htslib
+ENV MAFFT_VERSION="7.490"
+ENV mafft_dir /${PROGRAMS}/mafft-${MAFFT_VERSION}
+RUN  wget --no-check-certificate -O mafft-${MAFFT_VERSION}-without-extensions-src.tgz https://mafft.cbrc.jp/alignment/software/mafft-${MAFFT_VERSION}-without-extensions-src.tgz \
+     && tar zxf mafft-${MAFFT_VERSION}-without-extensions-src.tgz \
+     && rm mafft-${MAFFT_VERSION}-without-extensions-src.tgz \
+     && cd mafft-${MAFFT_VERSION}-without-extensions/core \
+     && make clean \
+     && make \
+     && make install
+     
+
 ## Multi-stage build
-FROM rocker/tidyverse:4.2.2
+FROM rocker/tidyverse:4.5.1
 
 ENV APP_NAME="bioinformatics" \
 	TZ='US/Eastern' \
